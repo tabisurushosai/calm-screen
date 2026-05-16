@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { composeFilterValue } from "./compose";
 import * as blueFilter from "./blue-filter";
 import * as desaturate from "./desaturate";
+import * as darkForce from "./dark-force";
 import { DEFAULTS, type Settings } from "../storage";
 
 function settings(patch: Partial<Settings> = {}): Settings {
@@ -94,5 +95,76 @@ describe("compose filter value", () => {
     expect(hi).toContain("saturate(0.4)");
     expect(lo).toContain("sepia(0.15)");
     expect(lo).toContain("saturate(0.8)");
+  });
+
+  it("omits dark-force from compose at low intensity (invert=false → toFilterValue=='')", () => {
+    const value = composeFilterValue(
+      settings({
+        intensity: "low",
+        features: { ...DEFAULTS.features, blue_filter: false, desaturate: false, dark_force: true },
+      }),
+    );
+    expect(value).toBe("");
+  });
+
+  it("emits ONLY the invert filter when dark-force is the sole enabled feature at medium", () => {
+    const value = composeFilterValue(
+      settings({
+        intensity: "medium",
+        features: { ...DEFAULTS.features, blue_filter: false, desaturate: false, dark_force: true },
+      }),
+    );
+    expect(value).toBe(darkForce.INVERT_FILTER);
+  });
+
+  it("emits ONLY the invert filter when dark-force is the sole enabled feature at high", () => {
+    const value = composeFilterValue(
+      settings({
+        intensity: "high",
+        features: { ...DEFAULTS.features, blue_filter: false, desaturate: false, dark_force: true },
+      }),
+    );
+    expect(value).toBe(darkForce.INVERT_FILTER);
+  });
+
+  it("places dark-force invert AFTER blue-filter and desaturate (ordering invariant)", () => {
+    const value = composeFilterValue(
+      settings({
+        intensity: "high",
+        features: {
+          ...DEFAULTS.features,
+          blue_filter: true,
+          desaturate: true,
+          dark_force: true,
+        },
+      }),
+    );
+    const sepiaIdx = value.indexOf("sepia(");
+    const saturateIdx = value.indexOf("saturate(");
+    const invertIdx = value.indexOf("invert(");
+    expect(sepiaIdx).toBeGreaterThanOrEqual(0);
+    expect(saturateIdx).toBeGreaterThanOrEqual(0);
+    expect(invertIdx).toBeGreaterThanOrEqual(0);
+    expect(sepiaIdx).toBeLessThan(saturateIdx);
+    expect(saturateIdx).toBeLessThan(invertIdx);
+  });
+
+  it("stacks blue-filter + dark-force(medium) space-joined in order blue-filter → dark-force", () => {
+    const value = composeFilterValue(
+      settings({
+        intensity: "medium",
+        features: {
+          ...DEFAULTS.features,
+          blue_filter: true,
+          desaturate: false,
+          dark_force: true,
+        },
+      }),
+    );
+    const expected = [
+      blueFilter.toFilterValue(blueFilter.paramsFor("medium")),
+      darkForce.INVERT_FILTER,
+    ].join(" ");
+    expect(value).toBe(expected);
   });
 });
