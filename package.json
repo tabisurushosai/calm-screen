@@ -10,7 +10,7 @@
     "lint": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "package": "npm run build && cd dist && zip -r ../release/calm-screen.zip ."
+    "package": "npm run build && node scripts/package-zip.mjs"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.260",
