@@ -1,0 +1,152 @@
+{
+  "appName": {
+    "message": "Calm Screen",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "Visual sensitivity support (blue-light filter, desaturation, animation mute, forced dark mode). Ad-free, no personal data collected.",
+    "description": "Extension description (within 132 chars)"
+  },
+  "popup_title": {
+    "message": "Calm Screen",
+    "description": "Popup title"
+  },
+  "popup_enable": {
+    "message": "On",
+    "description": "Toggle to enable the extension"
+  },
+  "popup_disable": {
+    "message": "Off",
+    "description": "Toggle to disable the extension"
+  },
+  "popup_feature_blue_filter": {
+    "message": "Blue-light filter",
+    "description": "Label for the blue-light filter feature"
+  },
+  "popup_feature_blue_filter_desc": {
+    "message": "Adjusts the screen to a gentler warm tone",
+    "description": "Description for the blue-light filter feature"
+  },
+  "popup_feature_desaturate": {
+    "message": "Desaturate",
+    "description": "Label for the desaturation feature"
+  },
+  "popup_feature_desaturate_desc": {
+    "message": "Tones down vivid colors to softer ones",
+    "description": "Description for the desaturation feature"
+  },
+  "popup_feature_animation_mute": {
+    "message": "Mute animations",
+    "description": "Label for the animation-mute feature"
+  },
+  "popup_feature_animation_mute_desc": {
+    "message": "Stops page motion to help you focus",
+    "description": "Description for the animation-mute feature"
+  },
+  "popup_feature_dark_force": {
+    "message": "Force dark mode",
+    "description": "Label for the forced dark-mode feature"
+  },
+  "popup_feature_dark_force_desc": {
+    "message": "Darkens bright backgrounds to reduce glare",
+    "description": "Description for the forced dark-mode feature"
+  },
+  "popup_feature_brightness_cap": {
+    "message": "Brightness cap",
+    "description": "Label for the brightness-cap feature"
+  },
+  "popup_feature_brightness_cap_desc": {
+    "message": "Limits the overall brightness of the page",
+    "description": "Description for the brightness-cap feature"
+  },
+  "popup_open_options": {
+    "message": "Settings",
+    "description": "Button that opens the options page"
+  },
+  "popup_premium_badge": {
+    "message": "Premium",
+    "description": "Badge for Premium features"
+  },
+  "popup_trial_remaining": {
+    "message": "Trial: $DAYS$ days left",
+    "description": "Free trial remaining days",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "7"
+      }
+    }
+  },
+  "options_title": {
+    "message": "Calm Screen — Settings",
+    "description": "Options page title"
+  },
+  "options_section_features": {
+    "message": "Features",
+    "description": "Heading for the features section"
+  },
+  "options_section_intensity": {
+    "message": "Intensity",
+    "description": "Heading for the intensity section"
+  },
+  "options_section_premium": {
+    "message": "Premium",
+    "description": "Heading for the Premium section"
+  },
+  "options_section_about": {
+    "message": "About",
+    "description": "Heading for the about section"
+  },
+  "options_intensity_low": {
+    "message": "Low",
+    "description": "Intensity: low"
+  },
+  "options_intensity_medium": {
+    "message": "Medium",
+    "description": "Intensity: medium"
+  },
+  "options_intensity_high": {
+    "message": "High",
+    "description": "Intensity: high"
+  },
+  "options_save": {
+    "message": "Save",
+    "description": "Save settings button"
+  },
+  "options_saved": {
+    "message": "Saved",
+    "description": "Save-complete message"
+  },
+  "options_reset": {
+    "message": "Reset to defaults",
+    "description": "Reset button"
+  },
+  "options_privacy_link": {
+    "message": "Privacy Policy",
+    "description": "Link to the privacy policy"
+  },
+  "options_terms_link": {
+    "message": "Terms of Service",
+    "description": "Link to the terms of service"
+  },
+  "premium_upgrade_button": {
+    "message": "Upgrade to Premium ($3)",
+    "description": "Premium purchase button"
+  },
+  "premium_unlocked": {
+    "message": "Premium features are unlocked",
+    "description": "Premium-unlocked message"
+  },
+  "premium_trial_start": {
+    "message": "Start 7-day free trial",
+    "description": "Free-trial start button"
+  },
+  "premium_trial_expired": {
+    "message": "Your trial has ended",
+    "description": "Trial-expired message"
+  },
+  "premium_feature_locked": {
+    "message": "This feature is Premium-only",
+    "description": "Premium-lock message"
+  }
+}
