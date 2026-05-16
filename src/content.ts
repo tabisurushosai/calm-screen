@@ -1,6 +1,7 @@
 import { loadSettings, onSettingsChanged, type Settings } from "./storage";
 import { composeFilterValue } from "./features/compose";
 import * as animationMute from "./features/animation-mute";
+import * as darkForce from "./features/dark-force";
 
 const COMPOSED_STYLE_ID = "calm-screen-filter";
 
@@ -42,9 +43,18 @@ function reconcileAnimationMute(settings: Settings): void {
   }
 }
 
+function reconcileDarkForce(settings: Settings): void {
+  if (settings.enabled && settings.features.dark_force) {
+    darkForce.apply(document, darkForce.paramsFor(settings.intensity));
+  } else {
+    darkForce.remove(document);
+  }
+}
+
 function reconcile(settings: Settings): void {
   applyComposedFilter(document, composeFilterValue(settings));
   reconcileAnimationMute(settings);
+  reconcileDarkForce(settings);
 }
 
 function schedule(settings: Settings): void {
