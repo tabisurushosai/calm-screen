@@ -1,23 +1,10 @@
 import { loadSettings, onSettingsChanged, type Settings } from "./storage";
-import * as blueFilter from "./features/blue-filter";
-import * as desaturate from "./features/desaturate";
+import { composeFilterValue } from "./features/compose";
 
 const COMPOSED_STYLE_ID = "calm-screen-filter";
 
 let rafHandle: number | null = null;
 let pendingSettings: Settings | null = null;
-
-function composeFilterValue(settings: Settings): string {
-  if (!settings.enabled) return "";
-  const parts: string[] = [];
-  if (settings.features.blue_filter) {
-    parts.push(blueFilter.toFilterValue(blueFilter.paramsFor(settings.intensity)));
-  }
-  if (settings.features.desaturate) {
-    parts.push(desaturate.toFilterValue(desaturate.paramsFor(settings.intensity)));
-  }
-  return parts.join(" ");
-}
 
 function applyComposedFilter(doc: Document, value: string): void {
   const root = doc.documentElement;
