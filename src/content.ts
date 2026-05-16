@@ -1,5 +1,6 @@
 import { loadSettings, onSettingsChanged, type Settings } from "./storage";
 import { composeFilterValue } from "./features/compose";
+import * as animationMute from "./features/animation-mute";
 
 const COMPOSED_STYLE_ID = "calm-screen-filter";
 
@@ -33,8 +34,17 @@ function applyComposedFilter(doc: Document, value: string): void {
   root.style.setProperty("filter", value, "important");
 }
 
+function reconcileAnimationMute(settings: Settings): void {
+  if (settings.enabled && settings.features.animation_mute) {
+    animationMute.apply(document, animationMute.paramsFor(settings.intensity));
+  } else {
+    animationMute.remove(document);
+  }
+}
+
 function reconcile(settings: Settings): void {
   applyComposedFilter(document, composeFilterValue(settings));
+  reconcileAnimationMute(settings);
 }
 
 function schedule(settings: Settings): void {
