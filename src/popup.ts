@@ -1,24 +1,17 @@
 import { applyI18n, t } from "./i18n";
-
-type FeatureKey =
-  | "blue_filter"
-  | "desaturate"
-  | "animation_mute"
-  | "dark_force"
-  | "brightness_cap";
-
-interface StoredSettings {
-  enabled: boolean;
-  features: Record<FeatureKey, boolean>;
-  premium_unlocked: boolean;
-  trial_start_ts: number | null;
-}
-
-const PREMIUM_FEATURES: ReadonlySet<FeatureKey> = new Set<FeatureKey>([
-  "brightness_cap",
-]);
-
-const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+import {
+  loadSettings,
+  setFeature,
+  setMasterEnabled,
+  type FeatureKey,
+  type Settings,
+} from "./storage";
+import {
+  getPremiumStatus,
+  isFeaturePremium,
+  isPremiumActive,
+  type PremiumStatus,
+} from "./premium";
 
 const FEATURE_KEY_MAP: Record<string, FeatureKey> = {
   "blue-filter": "blue_filter",
@@ -32,54 +25,25 @@ function toFeatureKey(domKey: string): FeatureKey | null {
   return FEATURE_KEY_MAP[domKey] ?? null;
 }
 
-async function loadSettings(): Promise<StoredSettings> {
-  const raw = (await chrome.storage.local.get([
-    "enabled",
-    "features",
-    "premium_unlocked",
-    "trial_start_ts",
-  ])) as Partial<StoredSettings>;
-
-  return {
-    enabled: raw.enabled ?? true,
-    features: {
-      blue_filter: raw.features?.blue_filter ?? true,
-      desaturate: raw.features?.desaturate ?? true,
-      animation_mute: raw.features?.animation_mute ?? true,
-      dark_force: raw.features?.dark_force ?? false,
-      brightness_cap: raw.features?.brightness_cap ?? false,
-    },
-    premium_unlocked: raw.premium_unlocked ?? false,
-    trial_start_ts: raw.trial_start_ts ?? null,
-  };
-}
-
-function trialDaysRemaining(trialStartTs: number | null): number {
-  if (!trialStartTs) return 0;
-  const elapsed = Date.now() - trialStartTs;
-  const remaining = Math.ceil((TRIAL_DURATION_MS - elapsed) / (24 * 60 * 60 * 1000));
-  return Math.max(0, remaining);
-}
-
-function isPremiumActive(settings: StoredSettings): boolean {
-  if (settings.premium_unlocked) return true;
-  return trialDaysRemaining(settings.trial_start_ts) > 0;
-}
-
-function renderTrialBanner(settings: StoredSettings): void {
+function renderTrialBanner(status: PremiumStatus, settings: Settings): void {
   const banner = document.getElementById("trial-banner") as HTMLElement | null;
   const text = document.getElementById("trial-text");
   if (!banner || !text) return;
 
-  if (settings.premium_unlocked) {
+  if (status.tier === "paid") {
     text.textContent = t("premium_unlocked");
     banner.hidden = false;
     return;
   }
 
-  const days = trialDaysRemaining(settings.trial_start_ts);
-  if (settings.trial_start_ts && days > 0) {
-    text.textContent = t("popup_trial_remaining", String(days));
+  if (status.tier === "trial") {
+    text.textContent = t("popup_trial_remaining", String(status.trialDaysRemaining));
+    banner.hidden = false;
+    return;
+  }
+
+  if (settings.trial_start_ts && status.trialDaysRemaining === 0) {
+    text.textContent = t("premium_trial_expired");
     banner.hidden = false;
     return;
   }
@@ -91,13 +55,16 @@ function applyMasterEnabledState(enabled: boolean): void {
   document.body.classList.toggle("popup--disabled", !enabled);
 }
 
-function applyPremiumLockState(features: NodeListOf<HTMLLabelElement>, premiumActive: boolean): void {
+function applyPremiumLockState(
+  features: NodeListOf<HTMLLabelElement>,
+  premiumActive: boolean,
+): void {
   features.forEach((label) => {
     const domKey = label.dataset.feature;
     if (!domKey) return;
     const key = toFeatureKey(domKey);
     if (!key) return;
-    if (!PREMIUM_FEATURES.has(key)) return;
+    if (!isFeaturePremium(key)) return;
 
     const input = label.querySelector<HTMLInputElement>(".feature__toggle");
     if (!input) return;
@@ -115,7 +82,9 @@ function applyPremiumLockState(features: NodeListOf<HTMLLabelElement>, premiumAc
   });
 }
 
-function hydrateUi(settings: StoredSettings): void {
+function hydrateUi(settings: Settings): void {
+  const status = getPremiumStatus(settings);
+
   const master = document.getElementById("master-toggle") as HTMLInputElement | null;
   if (master) {
     master.checked = settings.enabled;
@@ -134,7 +103,7 @@ function hydrateUi(settings: StoredSettings): void {
   });
 
   applyPremiumLockState(featureLabels, isPremiumActive(settings));
-  renderTrialBanner(settings);
+  renderTrialBanner(status, settings);
 }
 
 function wireEvents(): void {
@@ -142,7 +111,7 @@ function wireEvents(): void {
   master?.addEventListener("change", () => {
     const enabled = master.checked;
     applyMasterEnabledState(enabled);
-    chrome.storage.local.set({ enabled }).catch((err) => {
+    setMasterEnabled(enabled).catch((err) => {
       console.error("[calm-screen] failed to persist enabled", err);
     });
   });
@@ -153,12 +122,7 @@ function wireEvents(): void {
       if (!domKey) return;
       const key = toFeatureKey(domKey);
       if (!key) return;
-
-      const current = (await chrome.storage.local.get("features")) as {
-        features?: Record<FeatureKey, boolean>;
-      };
-      const next = { ...(current.features ?? {}), [key]: input.checked };
-      await chrome.storage.local.set({ features: next });
+      await setFeature(key, input.checked);
     });
   });
 

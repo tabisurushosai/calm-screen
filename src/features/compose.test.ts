@@ -183,6 +183,7 @@ describe("compose filter value", () => {
     for (const intensity of ["low", "medium", "high"] as const) {
       const value = composeFilterValue(
         settings({
+          premium_unlocked: true,
           intensity,
           features: {
             blue_filter: false,
@@ -200,6 +201,7 @@ describe("compose filter value", () => {
   it("stacks blue-filter + brightness-cap space-joined in order blue-filter → brightness-cap", () => {
     const value = composeFilterValue(
       settings({
+        premium_unlocked: true,
         intensity: "medium",
         features: {
           ...DEFAULTS.features,
@@ -219,6 +221,7 @@ describe("compose filter value", () => {
   it("places brightness-cap AFTER desaturate (deterministic ordering)", () => {
     const value = composeFilterValue(
       settings({
+        premium_unlocked: true,
         intensity: "medium",
         features: {
           ...DEFAULTS.features,
@@ -234,6 +237,7 @@ describe("compose filter value", () => {
   it("places brightness-cap BEFORE dark-force(medium) invert (so brightness applies in pre-invert color space)", () => {
     const value = composeFilterValue(
       settings({
+        premium_unlocked: true,
         intensity: "medium",
         features: {
           ...DEFAULTS.features,
@@ -254,6 +258,7 @@ describe("compose filter value", () => {
   it("full stack emits blue-filter → desaturate → brightness-cap → dark-force(invert) in this exact order", () => {
     const value = composeFilterValue(
       settings({
+        premium_unlocked: true,
         intensity: "high",
         features: {
           ...DEFAULTS.features,
@@ -280,6 +285,7 @@ describe("compose filter value", () => {
   it("brightness-cap contributes even at low intensity (unlike dark-force which omits at low)", () => {
     const value = composeFilterValue(
       settings({
+        premium_unlocked: true,
         intensity: "low",
         features: {
           blue_filter: false,
@@ -298,10 +304,112 @@ describe("compose filter value", () => {
     expect(
       composeFilterValue(
         settings({
+          premium_unlocked: true,
           enabled: false,
           features: { ...DEFAULTS.features, brightness_cap: true },
         }),
       ),
     ).toBe("");
+  });
+});
+
+describe("compose premium gating (defense-in-depth)", () => {
+  const NOW = 1_700_000_000_000;
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+  const TRIAL_MS = 7 * ONE_DAY;
+
+  it("omits brightness-cap for free users even when features.brightness_cap=true", () => {
+    const value = composeFilterValue(
+      settings({
+        premium_unlocked: false,
+        trial_start_ts: null,
+        intensity: "medium",
+        features: {
+          ...DEFAULTS.features,
+          blue_filter: false,
+          desaturate: false,
+          brightness_cap: true,
+        },
+      }),
+      NOW,
+    );
+    expect(value).not.toContain("brightness(");
+    expect(value).toBe("");
+  });
+
+  it("includes brightness-cap during active trial", () => {
+    const value = composeFilterValue(
+      settings({
+        premium_unlocked: false,
+        trial_start_ts: NOW - ONE_DAY,
+        intensity: "medium",
+        features: {
+          ...DEFAULTS.features,
+          blue_filter: false,
+          desaturate: false,
+          brightness_cap: true,
+        },
+      }),
+      NOW,
+    );
+    expect(value).toBe(brightnessCap.toFilterValue(brightnessCap.paramsFor("medium")));
+  });
+
+  it("includes brightness-cap for paid users", () => {
+    const value = composeFilterValue(
+      settings({
+        premium_unlocked: true,
+        intensity: "high",
+        features: {
+          ...DEFAULTS.features,
+          blue_filter: false,
+          desaturate: false,
+          brightness_cap: true,
+        },
+      }),
+      NOW,
+    );
+    expect(value).toBe(brightnessCap.toFilterValue(brightnessCap.paramsFor("high")));
+  });
+
+  it("re-locks brightness-cap once trial expires (without purchase)", () => {
+    const value = composeFilterValue(
+      settings({
+        premium_unlocked: false,
+        trial_start_ts: NOW - TRIAL_MS - ONE_DAY,
+        intensity: "high",
+        features: {
+          ...DEFAULTS.features,
+          blue_filter: false,
+          desaturate: false,
+          brightness_cap: true,
+        },
+      }),
+      NOW,
+    );
+    expect(value).not.toContain("brightness(");
+    expect(value).toBe("");
+  });
+
+  it("free features (blue-filter, desaturate, dark-force) stay available regardless of premium state", () => {
+    const value = composeFilterValue(
+      settings({
+        premium_unlocked: false,
+        trial_start_ts: null,
+        intensity: "medium",
+        features: {
+          blue_filter: true,
+          desaturate: true,
+          animation_mute: false,
+          dark_force: true,
+          brightness_cap: true,
+        },
+      }),
+      NOW,
+    );
+    expect(value).toContain("sepia(");
+    expect(value).toContain("saturate(");
+    expect(value).toContain("invert(");
+    expect(value).not.toContain("brightness(");
   });
 });

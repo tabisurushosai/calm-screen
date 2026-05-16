@@ -1,27 +1,21 @@
 import { applyI18n, t } from "./i18n";
-
-type FeatureKey =
-  | "blue_filter"
-  | "desaturate"
-  | "animation_mute"
-  | "dark_force"
-  | "brightness_cap";
-
-type Intensity = "low" | "medium" | "high";
-
-interface StoredSettings {
-  enabled: boolean;
-  features: Record<FeatureKey, boolean>;
-  intensity: Intensity;
-  premium_unlocked: boolean;
-  trial_start_ts: number | null;
-}
-
-const PREMIUM_FEATURES: ReadonlySet<FeatureKey> = new Set<FeatureKey>([
-  "brightness_cap",
-]);
-
-const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+import {
+  loadSettings,
+  resetToDefaults,
+  setFeature,
+  setIntensity,
+  type FeatureKey,
+  type Intensity,
+  type Settings,
+} from "./storage";
+import {
+  getPremiumStatus,
+  isFeaturePremium,
+  isPremiumActive,
+  shouldStartTrial,
+  startTrial,
+  type PremiumStatus,
+} from "./premium";
 
 const FEATURE_KEY_MAP: Record<string, FeatureKey> = {
   "blue-filter": "blue_filter",
@@ -31,62 +25,8 @@ const FEATURE_KEY_MAP: Record<string, FeatureKey> = {
   "brightness-cap": "brightness_cap",
 };
 
-const DEFAULTS: StoredSettings = {
-  enabled: true,
-  features: {
-    blue_filter: true,
-    desaturate: true,
-    animation_mute: true,
-    dark_force: false,
-    brightness_cap: false,
-  },
-  intensity: "medium",
-  premium_unlocked: false,
-  trial_start_ts: null,
-};
-
 function toFeatureKey(domKey: string): FeatureKey | null {
   return FEATURE_KEY_MAP[domKey] ?? null;
-}
-
-async function loadSettings(): Promise<StoredSettings> {
-  const raw = (await chrome.storage.local.get([
-    "enabled",
-    "features",
-    "intensity",
-    "premium_unlocked",
-    "trial_start_ts",
-  ])) as Partial<StoredSettings>;
-
-  return {
-    enabled: raw.enabled ?? DEFAULTS.enabled,
-    features: {
-      blue_filter: raw.features?.blue_filter ?? DEFAULTS.features.blue_filter,
-      desaturate: raw.features?.desaturate ?? DEFAULTS.features.desaturate,
-      animation_mute:
-        raw.features?.animation_mute ?? DEFAULTS.features.animation_mute,
-      dark_force: raw.features?.dark_force ?? DEFAULTS.features.dark_force,
-      brightness_cap:
-        raw.features?.brightness_cap ?? DEFAULTS.features.brightness_cap,
-    },
-    intensity: raw.intensity ?? DEFAULTS.intensity,
-    premium_unlocked: raw.premium_unlocked ?? DEFAULTS.premium_unlocked,
-    trial_start_ts: raw.trial_start_ts ?? DEFAULTS.trial_start_ts,
-  };
-}
-
-function trialDaysRemaining(trialStartTs: number | null): number {
-  if (!trialStartTs) return 0;
-  const elapsed = Date.now() - trialStartTs;
-  const remaining = Math.ceil(
-    (TRIAL_DURATION_MS - elapsed) / (24 * 60 * 60 * 1000),
-  );
-  return Math.max(0, remaining);
-}
-
-function isPremiumActive(settings: StoredSettings): boolean {
-  if (settings.premium_unlocked) return true;
-  return trialDaysRemaining(settings.trial_start_ts) > 0;
 }
 
 function applyPremiumLockState(premiumActive: boolean): void {
@@ -97,7 +37,7 @@ function applyPremiumLockState(premiumActive: boolean): void {
       if (!domKey) return;
       const key = toFeatureKey(domKey);
       if (!key) return;
-      if (!PREMIUM_FEATURES.has(key)) return;
+      if (!isFeaturePremium(key)) return;
 
       const input = label.querySelector<HTMLInputElement>(".feature__toggle");
       if (!input) return;
@@ -115,7 +55,7 @@ function applyPremiumLockState(premiumActive: boolean): void {
     });
 }
 
-function renderPremiumSection(settings: StoredSettings): void {
+function renderPremiumSection(status: PremiumStatus, settings: Settings): void {
   const text = document.getElementById("premium-status-text");
   const trialBtn = document.getElementById(
     "trial-start-btn",
@@ -125,22 +65,21 @@ function renderPremiumSection(settings: StoredSettings): void {
   ) as HTMLButtonElement | null;
   if (!text || !trialBtn || !upgradeBtn) return;
 
-  if (settings.premium_unlocked) {
+  if (status.tier === "paid") {
     text.textContent = t("premium_unlocked");
     trialBtn.hidden = true;
     upgradeBtn.hidden = true;
     return;
   }
 
-  const days = trialDaysRemaining(settings.trial_start_ts);
-  if (settings.trial_start_ts && days > 0) {
-    text.textContent = t("popup_trial_remaining", String(days));
+  if (status.tier === "trial") {
+    text.textContent = t("popup_trial_remaining", String(status.trialDaysRemaining));
     trialBtn.hidden = true;
     upgradeBtn.hidden = false;
     return;
   }
 
-  if (settings.trial_start_ts && days === 0) {
+  if (settings.trial_start_ts && status.trialDaysRemaining === 0) {
     text.textContent = t("premium_trial_expired");
     trialBtn.hidden = true;
     upgradeBtn.hidden = false;
@@ -148,11 +87,13 @@ function renderPremiumSection(settings: StoredSettings): void {
   }
 
   text.textContent = "";
-  trialBtn.hidden = false;
+  trialBtn.hidden = !shouldStartTrial(settings);
   upgradeBtn.hidden = false;
 }
 
-function hydrateUi(settings: StoredSettings): void {
+function hydrateUi(settings: Settings): void {
+  const status = getPremiumStatus(settings);
+
   document
     .querySelectorAll<HTMLLabelElement>(".feature")
     .forEach((label) => {
@@ -172,7 +113,7 @@ function hydrateUi(settings: StoredSettings): void {
     });
 
   applyPremiumLockState(isPremiumActive(settings));
-  renderPremiumSection(settings);
+  renderPremiumSection(status, settings);
 }
 
 function flashSaved(): void {
@@ -193,11 +134,7 @@ function wireEvents(): void {
         if (!domKey) return;
         const key = toFeatureKey(domKey);
         if (!key) return;
-        const current = (await chrome.storage.local.get("features")) as {
-          features?: Record<FeatureKey, boolean>;
-        };
-        const next = { ...(current.features ?? {}), [key]: input.checked };
-        await chrome.storage.local.set({ features: next });
+        await setFeature(key, input.checked);
         flashSaved();
       });
     });
@@ -207,8 +144,7 @@ function wireEvents(): void {
     .forEach((input) => {
       input.addEventListener("change", async () => {
         if (!input.checked) return;
-        const intensity = input.value as Intensity;
-        await chrome.storage.local.set({ intensity });
+        await setIntensity(input.value as Intensity);
         flashSaved();
       });
     });
@@ -217,11 +153,7 @@ function wireEvents(): void {
     "reset-btn",
   ) as HTMLButtonElement | null;
   resetBtn?.addEventListener("click", async () => {
-    await chrome.storage.local.set({
-      enabled: DEFAULTS.enabled,
-      features: DEFAULTS.features,
-      intensity: DEFAULTS.intensity,
-    });
+    await resetToDefaults();
     const settings = await loadSettings();
     hydrateUi(settings);
     flashSaved();
@@ -231,7 +163,7 @@ function wireEvents(): void {
     "trial-start-btn",
   ) as HTMLButtonElement | null;
   trialBtn?.addEventListener("click", async () => {
-    await chrome.storage.local.set({ trial_start_ts: Date.now() });
+    await startTrial();
     const settings = await loadSettings();
     hydrateUi(settings);
     flashSaved();
