@@ -29,7 +29,7 @@
 - [x] T022: animation-mute — 設計
 - [x] T023: animation-mute — 実装
 - [x] T024: animation-mute — テスト・整合
-- [ ] T025: dark-force — 設計
+- [x] T025: dark-force — 設計
 - [ ] T026: dark-force — 実装
 - [ ] T027: dark-force — テスト・整合
 - [ ] T028: brightness-cap — 設計
