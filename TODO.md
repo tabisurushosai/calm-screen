@@ -34,7 +34,7 @@
 - [x] T027: dark-force — テスト・整合
 - [x] T028: brightness-cap — 設計
 - [x] T029: brightness-cap — 実装
-- [ ] T030: brightness-cap — テスト・整合
+- [x] T030: brightness-cap — テスト・整合
 
 ## Phase 4: Premium ゲート (T031-T033)
 - [ ] T031: src/premium.ts (trial_start_ts 管理、is_premium / is_trial 判定関数)
