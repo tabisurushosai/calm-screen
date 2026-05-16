@@ -8,11 +8,16 @@
     "build": "vite build",
     "dev": "vite build --watch",
     "lint": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "package": "npm run build && cd dist && zip -r ../release/calm-screen.zip ."
   },
   "devDependencies": {
     "@types/chrome": "^0.0.260",
+    "@vitest/ui": "^1.6.1",
+    "jsdom": "^24.1.3",
     "typescript": "^5.4.0",
-    "vite": "^5.2.0"
+    "vite": "^5.2.0",
+    "vitest": "^1.6.1"
   }
 }
