@@ -1,0 +1,152 @@
+{
+  "appName": {
+    "message": "やさしい画面",
+    "description": "拡張機能の名前"
+  },
+  "appDesc": {
+    "message": "視覚過敏対応 (青色光カット、彩度抑制、アニメ抑制、ダークモード強制)。広告なし・個人情報収集なし。",
+    "description": "拡張機能の説明 (132字以内)"
+  },
+  "popup_title": {
+    "message": "やさしい画面",
+    "description": "ポップアップのタイトル"
+  },
+  "popup_enable": {
+    "message": "有効",
+    "description": "拡張機能を有効化するトグル"
+  },
+  "popup_disable": {
+    "message": "無効",
+    "description": "拡張機能を無効化するトグル"
+  },
+  "popup_feature_blue_filter": {
+    "message": "青色光カット",
+    "description": "ブルーライトカット機能のラベル"
+  },
+  "popup_feature_blue_filter_desc": {
+    "message": "目に優しい暖色トーンに調整します",
+    "description": "ブルーライトカット機能の説明"
+  },
+  "popup_feature_desaturate": {
+    "message": "彩度抑制",
+    "description": "彩度を下げる機能のラベル"
+  },
+  "popup_feature_desaturate_desc": {
+    "message": "鮮やかな色を落ち着いた色に抑えます",
+    "description": "彩度抑制機能の説明"
+  },
+  "popup_feature_animation_mute": {
+    "message": "アニメ抑制",
+    "description": "アニメーション抑制機能のラベル"
+  },
+  "popup_feature_animation_mute_desc": {
+    "message": "ページの動きを止め、集中しやすくします",
+    "description": "アニメ抑制機能の説明"
+  },
+  "popup_feature_dark_force": {
+    "message": "ダークモード強制",
+    "description": "ダークモード強制機能のラベル"
+  },
+  "popup_feature_dark_force_desc": {
+    "message": "明るい背景を暗くして眩しさを抑えます",
+    "description": "ダークモード強制機能の説明"
+  },
+  "popup_feature_brightness_cap": {
+    "message": "明るさ制限",
+    "description": "輝度制限機能のラベル"
+  },
+  "popup_feature_brightness_cap_desc": {
+    "message": "画面全体の明るさの上限を抑えます",
+    "description": "輝度制限機能の説明"
+  },
+  "popup_open_options": {
+    "message": "詳細設定",
+    "description": "オプション画面を開くボタン"
+  },
+  "popup_premium_badge": {
+    "message": "Premium",
+    "description": "Premium 機能のバッジ"
+  },
+  "popup_trial_remaining": {
+    "message": "お試し残り $DAYS$ 日",
+    "description": "無料お試し残日数",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "7"
+      }
+    }
+  },
+  "options_title": {
+    "message": "やさしい画面 — 詳細設定",
+    "description": "オプション画面のタイトル"
+  },
+  "options_section_features": {
+    "message": "機能",
+    "description": "機能設定セクションの見出し"
+  },
+  "options_section_intensity": {
+    "message": "強度",
+    "description": "強度調整セクションの見出し"
+  },
+  "options_section_premium": {
+    "message": "Premium",
+    "description": "Premium セクションの見出し"
+  },
+  "options_section_about": {
+    "message": "このアプリについて",
+    "description": "アプリ情報セクションの見出し"
+  },
+  "options_intensity_low": {
+    "message": "弱",
+    "description": "強度: 弱"
+  },
+  "options_intensity_medium": {
+    "message": "中",
+    "description": "強度: 中"
+  },
+  "options_intensity_high": {
+    "message": "強",
+    "description": "強度: 強"
+  },
+  "options_save": {
+    "message": "保存",
+    "description": "設定保存ボタン"
+  },
+  "options_saved": {
+    "message": "保存しました",
+    "description": "保存完了メッセージ"
+  },
+  "options_reset": {
+    "message": "初期設定に戻す",
+    "description": "リセットボタン"
+  },
+  "options_privacy_link": {
+    "message": "プライバシーポリシー",
+    "description": "プライバシーポリシーへのリンク"
+  },
+  "options_terms_link": {
+    "message": "利用規約",
+    "description": "利用規約へのリンク"
+  },
+  "premium_upgrade_button": {
+    "message": "Premium にアップグレード ($3)",
+    "description": "Premium 購入ボタン"
+  },
+  "premium_unlocked": {
+    "message": "Premium 機能が解放されています",
+    "description": "Premium 解放済みメッセージ"
+  },
+  "premium_trial_start": {
+    "message": "7日間無料お試しを開始",
+    "description": "無料お試し開始ボタン"
+  },
+  "premium_trial_expired": {
+    "message": "お試し期間が終了しました",
+    "description": "お試し終了メッセージ"
+  },
+  "premium_feature_locked": {
+    "message": "この機能は Premium 限定です",
+    "description": "Premium ロックメッセージ"
+  }
+}
