@@ -16,6 +16,7 @@ import {
   startTrial,
   type PremiumStatus,
 } from "./premium";
+import { openUpgradeCheckout } from "./upgrade";
 
 const FEATURE_KEY_MAP: Record<string, FeatureKey> = {
   "blue-filter": "blue_filter",
@@ -173,9 +174,9 @@ function wireEvents(): void {
     "upgrade-btn",
   ) as HTMLButtonElement | null;
   upgradeBtn?.addEventListener("click", () => {
-    chrome.tabs.create({
-      url: "https://github.com/tabisurushosai/calm-screen#premium",
-    });
+    openUpgradeCheckout({ locale: chrome.i18n.getUILanguage().startsWith("ja") ? "ja" : "en" }).catch(
+      (err) => console.error("[calm-screen] openUpgradeCheckout failed", err),
+    );
   });
 }
 
