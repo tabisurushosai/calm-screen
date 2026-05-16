@@ -23,7 +23,7 @@
 - [x] T016: blue-filter — 設計
 - [x] T017: blue-filter — 実装
 - [x] T018: blue-filter — テスト・整合
-- [ ] T019: desaturate — 設計
+- [x] T019: desaturate — 設計
 - [ ] T020: desaturate — 実装
 - [ ] T021: desaturate — テスト・整合
 - [ ] T022: animation-mute — 設計
