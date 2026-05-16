@@ -33,7 +33,7 @@
 - [x] T026: dark-force — 実装
 - [x] T027: dark-force — テスト・整合
 - [x] T028: brightness-cap — 設計
-- [ ] T029: brightness-cap — 実装
+- [x] T029: brightness-cap — 実装
 - [ ] T030: brightness-cap — テスト・整合
 
 ## Phase 4: Premium ゲート (T031-T033)

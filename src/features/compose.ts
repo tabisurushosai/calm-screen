@@ -1,6 +1,7 @@
 import type { Settings } from "../storage";
 import * as blueFilter from "./blue-filter";
 import * as desaturate from "./desaturate";
+import * as brightnessCap from "./brightness-cap";
 import * as darkForce from "./dark-force";
 
 export function composeFilterValue(settings: Settings): string {
@@ -11,6 +12,9 @@ export function composeFilterValue(settings: Settings): string {
   }
   if (settings.features.desaturate) {
     parts.push(desaturate.toFilterValue(desaturate.paramsFor(settings.intensity)));
+  }
+  if (settings.features.brightness_cap) {
+    parts.push(brightnessCap.toFilterValue(brightnessCap.paramsFor(settings.intensity)));
   }
   if (settings.features.dark_force) {
     const v = darkForce.toFilterValue(darkForce.paramsFor(settings.intensity));
