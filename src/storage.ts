@@ -72,20 +72,47 @@ function coerceFeatures(raw: unknown): Record<FeatureKey, boolean> {
   return out;
 }
 
+async function storageGet(
+  keys: string | string[] | null,
+  context: string,
+): Promise<Record<string, unknown>> {
+  try {
+    return (await chrome.storage.local.get(keys)) as Record<string, unknown>;
+  } catch (err) {
+    console.error(`[calm-screen] chrome.storage.local.get failed (${context})`, err);
+    throw err;
+  }
+}
+
+async function storageSet(
+  items: Record<string, unknown>,
+  context: string,
+): Promise<void> {
+  try {
+    await chrome.storage.local.set(items);
+  } catch (err) {
+    console.error(`[calm-screen] chrome.storage.local.set failed (${context})`, err);
+    throw err;
+  }
+}
+
 /**
  * Read the persisted settings, coercing each field to its expected type and
  * substituting `DEFAULTS` for any missing/corrupted value. Always returns a
  * fully populated `Settings` object so callers do not need to null-check.
  */
 export async function loadSettings(): Promise<Settings> {
-  const raw = (await chrome.storage.local.get([
-    "enabled",
-    "features",
-    "intensity",
-    "premium_unlocked",
-    "trial_start_ts",
-    "schema_version",
-  ])) as Partial<Record<keyof Settings, unknown>>;
+  const raw = (await storageGet(
+    [
+      "enabled",
+      "features",
+      "intensity",
+      "premium_unlocked",
+      "trial_start_ts",
+      "schema_version",
+    ],
+    "loadSettings",
+  )) as Partial<Record<keyof Settings, unknown>>;
 
   return {
     enabled: typeof raw.enabled === "boolean" ? raw.enabled : DEFAULTS.enabled,
@@ -102,12 +129,12 @@ export async function loadSettings(): Promise<Settings> {
 
 /** Merge a partial settings patch into storage; no validation is performed. */
 export async function saveSettings(patch: Partial<Settings>): Promise<void> {
-  await chrome.storage.local.set(patch);
+  await storageSet(patch, "saveSettings");
 }
 
 /** Toggle the master on/off switch shown in the popup. */
 export async function setMasterEnabled(enabled: boolean): Promise<void> {
-  await chrome.storage.local.set({ enabled });
+  await storageSet({ enabled }, "setMasterEnabled");
 }
 
 /**
@@ -115,26 +142,26 @@ export async function setMasterEnabled(enabled: boolean): Promise<void> {
  * Internally re-coerces the current map so a corrupted record self-heals.
  */
 export async function setFeature(key: FeatureKey, value: boolean): Promise<void> {
-  const current = (await chrome.storage.local.get("features")) as {
+  const current = (await storageGet("features", "setFeature")) as {
     features?: Record<FeatureKey, boolean>;
   };
   const next = { ...coerceFeatures(current.features), [key]: value };
-  await chrome.storage.local.set({ features: next });
+  await storageSet({ features: next }, "setFeature");
 }
 
 /** Persist the global intensity level. */
 export async function setIntensity(intensity: Intensity): Promise<void> {
-  await chrome.storage.local.set({ intensity });
+  await storageSet({ intensity }, "setIntensity");
 }
 
 /** Stamp `now` as the trial start, kicking off the 7-day premium trial. */
 export async function startTrial(now: number = Date.now()): Promise<void> {
-  await chrome.storage.local.set({ trial_start_ts: now });
+  await storageSet({ trial_start_ts: now }, "startTrial");
 }
 
 /** Flip the paid-premium flag (called after Stripe webhook confirmation). */
 export async function setPremiumUnlocked(unlocked: boolean): Promise<void> {
-  await chrome.storage.local.set({ premium_unlocked: unlocked });
+  await storageSet({ premium_unlocked: unlocked }, "setPremiumUnlocked");
 }
 
 /**
@@ -143,11 +170,14 @@ export async function setPremiumUnlocked(unlocked: boolean): Promise<void> {
  * trial period.
  */
 export async function resetToDefaults(): Promise<void> {
-  await chrome.storage.local.set({
-    enabled: DEFAULTS.enabled,
-    features: DEFAULTS.features,
-    intensity: DEFAULTS.intensity,
-  });
+  await storageSet(
+    {
+      enabled: DEFAULTS.enabled,
+      features: DEFAULTS.features,
+      intensity: DEFAULTS.intensity,
+    },
+    "resetToDefaults",
+  );
 }
 
 /**

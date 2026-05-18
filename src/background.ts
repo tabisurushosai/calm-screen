@@ -31,10 +31,21 @@ type StoredSettings = typeof DEFAULT_SETTINGS;
  * without overwriting existing user choices.
  */
 async function initializeStorage(reason: chrome.runtime.OnInstalledReason): Promise<void> {
-  const current = (await chrome.storage.local.get(null)) as Partial<StoredSettings>;
+  let current: Partial<StoredSettings>;
+  try {
+    current = (await chrome.storage.local.get(null)) as Partial<StoredSettings>;
+  } catch (err) {
+    console.error("[calm-screen] chrome.storage.local.get failed (initializeStorage)", err);
+    throw err;
+  }
 
   if (reason === "install" || current.schema_version === undefined) {
-    await chrome.storage.local.set(DEFAULT_SETTINGS);
+    try {
+      await chrome.storage.local.set(DEFAULT_SETTINGS);
+    } catch (err) {
+      console.error("[calm-screen] chrome.storage.local.set failed (seed defaults)", err);
+      throw err;
+    }
     return;
   }
 
@@ -45,23 +56,36 @@ async function initializeStorage(reason: chrome.runtime.OnInstalledReason): Prom
     }
   }
   if (Object.keys(patch).length > 0) {
-    await chrome.storage.local.set(patch);
+    try {
+      await chrome.storage.local.set(patch);
+    } catch (err) {
+      console.error("[calm-screen] chrome.storage.local.set failed (fill missing keys)", err);
+      throw err;
+    }
   }
 }
 
-chrome.runtime.onInstalled.addListener((details) => {
-  initializeStorage(details.reason).catch((err) => {
-    console.error("[calm-screen] initializeStorage failed", err);
+try {
+  chrome.runtime.onInstalled.addListener((details) => {
+    initializeStorage(details.reason).catch((err) => {
+      console.error("[calm-screen] initializeStorage failed", err);
+    });
   });
-});
+} catch (err) {
+  console.error("[calm-screen] chrome.runtime.onInstalled.addListener failed", err);
+}
 
-chrome.runtime.onStartup.addListener(() => {
-  chrome.storage.local.get("schema_version").then((res) => {
-    if (res.schema_version === undefined) {
-      return chrome.storage.local.set(DEFAULT_SETTINGS);
-    }
-    return undefined;
-  }).catch((err) => {
-    console.error("[calm-screen] onStartup check failed", err);
+try {
+  chrome.runtime.onStartup.addListener(() => {
+    chrome.storage.local.get("schema_version").then((res) => {
+      if (res.schema_version === undefined) {
+        return chrome.storage.local.set(DEFAULT_SETTINGS);
+      }
+      return undefined;
+    }).catch((err) => {
+      console.error("[calm-screen] onStartup check failed", err);
+    });
   });
-});
+} catch (err) {
+  console.error("[calm-screen] chrome.runtime.onStartup.addListener failed", err);
+}

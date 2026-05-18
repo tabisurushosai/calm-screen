@@ -224,8 +224,14 @@ function wireEvents(): void {
     "upgrade-btn",
   ) as HTMLButtonElement | null;
   upgradeBtn?.addEventListener("click", () => {
-    openUpgradeCheckout({ locale: chrome.i18n.getUILanguage().startsWith("ja") ? "ja" : "en" }).catch(
-      (err) => console.error("[calm-screen] openUpgradeCheckout failed", err),
+    let locale = "en";
+    try {
+      locale = chrome.i18n.getUILanguage().startsWith("ja") ? "ja" : "en";
+    } catch (err) {
+      console.error("[calm-screen] chrome.i18n.getUILanguage failed", err);
+    }
+    openUpgradeCheckout({ locale }).catch((err) =>
+      console.error("[calm-screen] openUpgradeCheckout failed", err),
     );
   });
 

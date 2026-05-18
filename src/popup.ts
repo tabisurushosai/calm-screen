@@ -159,10 +159,14 @@ function wireEvents(): void {
 
   const openOptions = document.getElementById("open-options");
   openOptions?.addEventListener("click", () => {
-    if (chrome.runtime.openOptionsPage) {
-      chrome.runtime.openOptionsPage();
-    } else {
-      window.open(chrome.runtime.getURL("options.html"));
+    try {
+      if (chrome.runtime.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
+      } else {
+        window.open(chrome.runtime.getURL("options.html"));
+      }
+    } catch (err) {
+      console.error("[calm-screen] open options failed", err);
     }
   });
 

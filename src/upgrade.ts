@@ -75,7 +75,12 @@ export async function openUpgradeCheckout(
   opts: CheckoutUrlOptions = {},
 ): Promise<chrome.tabs.Tab | undefined> {
   const url = buildCheckoutUrl(opts);
-  return chrome.tabs.create({ url });
+  try {
+    return await chrome.tabs.create({ url });
+  } catch (err) {
+    console.error("[calm-screen] chrome.tabs.create failed", err);
+    throw err;
+  }
 }
 
 /** Flip the paid-premium flag in storage (typically after webhook success). */

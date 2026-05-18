@@ -60,8 +60,13 @@ export type MessageKey =
  * @returns The localized string, or `key` when no entry exists.
  */
 export function t(key: MessageKey, substitutions?: string | string[]): string {
-  const message = chrome.i18n.getMessage(key, substitutions);
-  return message || key;
+  try {
+    const message = chrome.i18n.getMessage(key, substitutions);
+    return message || key;
+  } catch (err) {
+    console.error(`[calm-screen] chrome.i18n.getMessage failed (${key})`, err);
+    return key;
+  }
 }
 
 /**
@@ -89,7 +94,12 @@ export function applyI18n(root: ParentNode = document): void {
   });
 
   const htmlEl = document.documentElement;
-  const uiLang = chrome.i18n.getUILanguage?.();
+  let uiLang: string | undefined;
+  try {
+    uiLang = chrome.i18n.getUILanguage?.();
+  } catch (err) {
+    console.error("[calm-screen] chrome.i18n.getUILanguage failed", err);
+  }
   if (uiLang && !htmlEl.getAttribute("lang")) {
     htmlEl.setAttribute("lang", uiLang);
   }
