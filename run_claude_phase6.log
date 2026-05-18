@@ -1,3 +1,9 @@
 [12:41:32] [calm-screen phase6 L1] 残15
 T101 完了。README.md を機能一覧 (表形式) と日英の使用例で書き直し、`TODO_PHASE6.md` のチェックを更新、`main` に push 済み。
 [12:42:43] [calm-screen phase6 L2] 残14
+T102 完了。`src/**/*.ts` 全 19 ファイル (本体 11 + テスト 8) に file-level `@fileoverview` を追加し、エクスポートされた型/関数および主要な内部ヘルパーに per-symbol JSDoc を付与。
+
+- 構造: 各ファイル冒頭に責務サマリ + 各 export に簡潔な目的記述 (param/returns は非自明な箇所のみ)
+- 検証: `npm run lint` (tsc --noEmit) clean、`npm test` 156/156 passing
+- TODO_PHASE6.md の T102 を `[x]` に更新、commit + push 済 (`d09486a`)
+[12:52:17] [calm-screen phase6 L3] 残13

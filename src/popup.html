@@ -24,7 +24,7 @@
         </label>
       </header>
 
-      <section class="popup__trial" id="trial-banner" hidden>
+      <section class="popup__trial" id="trial-banner" role="status" aria-live="polite" hidden>
         <span class="popup__trial-text" id="trial-text"></span>
       </section>
 
@@ -32,51 +32,87 @@
         <h2 class="popup__sr-only" id="features-heading" data-i18n="options_section_features">機能</h2>
 
         <label class="feature" data-feature="blue-filter">
-          <input type="checkbox" class="feature__toggle" data-feature-key="blue-filter" />
+          <input
+            type="checkbox"
+            class="feature__toggle"
+            data-feature-key="blue-filter"
+            aria-describedby="feature-blue-filter-desc"
+            data-i18n-attr="aria-label:popup_feature_blue_filter"
+          />
           <span class="feature__body">
             <span class="feature__name" data-i18n="popup_feature_blue_filter">青色光カット</span>
-            <span class="feature__desc" data-i18n="popup_feature_blue_filter_desc">目に優しい暖色トーンに調整します</span>
+            <span class="feature__desc" id="feature-blue-filter-desc" data-i18n="popup_feature_blue_filter_desc">目に優しい暖色トーンに調整します</span>
           </span>
         </label>
 
         <label class="feature" data-feature="desaturate">
-          <input type="checkbox" class="feature__toggle" data-feature-key="desaturate" />
+          <input
+            type="checkbox"
+            class="feature__toggle"
+            data-feature-key="desaturate"
+            aria-describedby="feature-desaturate-desc"
+            data-i18n-attr="aria-label:popup_feature_desaturate"
+          />
           <span class="feature__body">
             <span class="feature__name" data-i18n="popup_feature_desaturate">彩度抑制</span>
-            <span class="feature__desc" data-i18n="popup_feature_desaturate_desc">鮮やかな色を落ち着いた色に抑えます</span>
+            <span class="feature__desc" id="feature-desaturate-desc" data-i18n="popup_feature_desaturate_desc">鮮やかな色を落ち着いた色に抑えます</span>
           </span>
         </label>
 
         <label class="feature" data-feature="animation-mute">
-          <input type="checkbox" class="feature__toggle" data-feature-key="animation-mute" />
+          <input
+            type="checkbox"
+            class="feature__toggle"
+            data-feature-key="animation-mute"
+            aria-describedby="feature-animation-mute-desc"
+            data-i18n-attr="aria-label:popup_feature_animation_mute"
+          />
           <span class="feature__body">
             <span class="feature__name" data-i18n="popup_feature_animation_mute">アニメ抑制</span>
-            <span class="feature__desc" data-i18n="popup_feature_animation_mute_desc">ページの動きを止め、集中しやすくします</span>
+            <span class="feature__desc" id="feature-animation-mute-desc" data-i18n="popup_feature_animation_mute_desc">ページの動きを止め、集中しやすくします</span>
           </span>
         </label>
 
         <label class="feature" data-feature="dark-force">
-          <input type="checkbox" class="feature__toggle" data-feature-key="dark-force" />
+          <input
+            type="checkbox"
+            class="feature__toggle"
+            data-feature-key="dark-force"
+            aria-describedby="feature-dark-force-desc"
+            data-i18n-attr="aria-label:popup_feature_dark_force"
+          />
           <span class="feature__body">
             <span class="feature__name" data-i18n="popup_feature_dark_force">ダークモード強制</span>
-            <span class="feature__desc" data-i18n="popup_feature_dark_force_desc">明るい背景を暗くして眩しさを抑えます</span>
+            <span class="feature__desc" id="feature-dark-force-desc" data-i18n="popup_feature_dark_force_desc">明るい背景を暗くして眩しさを抑えます</span>
           </span>
         </label>
 
         <label class="feature feature--premium" data-feature="brightness-cap">
-          <input type="checkbox" class="feature__toggle" data-feature-key="brightness-cap" />
+          <input
+            type="checkbox"
+            class="feature__toggle"
+            data-feature-key="brightness-cap"
+            aria-describedby="feature-brightness-cap-desc"
+            data-i18n-attr="aria-label:popup_feature_brightness_cap"
+          />
           <span class="feature__body">
             <span class="feature__name">
               <span data-i18n="popup_feature_brightness_cap">明るさ制限</span>
               <span class="feature__badge" data-i18n="popup_premium_badge">Premium</span>
             </span>
-            <span class="feature__desc" data-i18n="popup_feature_brightness_cap_desc">画面全体の明るさの上限を抑えます</span>
+            <span class="feature__desc" id="feature-brightness-cap-desc" data-i18n="popup_feature_brightness_cap_desc">画面全体の明るさの上限を抑えます</span>
           </span>
         </label>
       </section>
 
       <footer class="popup__footer">
-        <button type="button" id="open-options" class="popup__options-btn" data-i18n="popup_open_options">
+        <button
+          type="button"
+          id="open-options"
+          class="popup__options-btn"
+          data-i18n="popup_open_options"
+          data-i18n-attr="aria-label:popup_open_options"
+        >
           詳細設定
         </button>
       </footer>

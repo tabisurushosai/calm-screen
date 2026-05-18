@@ -17,45 +17,75 @@
         <h2 class="options__section-title" id="features-heading" data-i18n="options_section_features">機能</h2>
         <div class="options__features">
           <label class="feature" data-feature="blue-filter">
-            <input type="checkbox" class="feature__toggle" data-feature-key="blue-filter" />
+            <input
+              type="checkbox"
+              class="feature__toggle"
+              data-feature-key="blue-filter"
+              aria-describedby="feature-blue-filter-desc"
+              data-i18n-attr="aria-label:popup_feature_blue_filter"
+            />
             <span class="feature__body">
               <span class="feature__name" data-i18n="popup_feature_blue_filter">青色光カット</span>
-              <span class="feature__desc" data-i18n="popup_feature_blue_filter_desc">目に優しい暖色トーンに調整します</span>
+              <span class="feature__desc" id="feature-blue-filter-desc" data-i18n="popup_feature_blue_filter_desc">目に優しい暖色トーンに調整します</span>
             </span>
           </label>
 
           <label class="feature" data-feature="desaturate">
-            <input type="checkbox" class="feature__toggle" data-feature-key="desaturate" />
+            <input
+              type="checkbox"
+              class="feature__toggle"
+              data-feature-key="desaturate"
+              aria-describedby="feature-desaturate-desc"
+              data-i18n-attr="aria-label:popup_feature_desaturate"
+            />
             <span class="feature__body">
               <span class="feature__name" data-i18n="popup_feature_desaturate">彩度抑制</span>
-              <span class="feature__desc" data-i18n="popup_feature_desaturate_desc">鮮やかな色を落ち着いた色に抑えます</span>
+              <span class="feature__desc" id="feature-desaturate-desc" data-i18n="popup_feature_desaturate_desc">鮮やかな色を落ち着いた色に抑えます</span>
             </span>
           </label>
 
           <label class="feature" data-feature="animation-mute">
-            <input type="checkbox" class="feature__toggle" data-feature-key="animation-mute" />
+            <input
+              type="checkbox"
+              class="feature__toggle"
+              data-feature-key="animation-mute"
+              aria-describedby="feature-animation-mute-desc"
+              data-i18n-attr="aria-label:popup_feature_animation_mute"
+            />
             <span class="feature__body">
               <span class="feature__name" data-i18n="popup_feature_animation_mute">アニメ抑制</span>
-              <span class="feature__desc" data-i18n="popup_feature_animation_mute_desc">ページの動きを止め、集中しやすくします</span>
+              <span class="feature__desc" id="feature-animation-mute-desc" data-i18n="popup_feature_animation_mute_desc">ページの動きを止め、集中しやすくします</span>
             </span>
           </label>
 
           <label class="feature" data-feature="dark-force">
-            <input type="checkbox" class="feature__toggle" data-feature-key="dark-force" />
+            <input
+              type="checkbox"
+              class="feature__toggle"
+              data-feature-key="dark-force"
+              aria-describedby="feature-dark-force-desc"
+              data-i18n-attr="aria-label:popup_feature_dark_force"
+            />
             <span class="feature__body">
               <span class="feature__name" data-i18n="popup_feature_dark_force">ダークモード強制</span>
-              <span class="feature__desc" data-i18n="popup_feature_dark_force_desc">明るい背景を暗くして眩しさを抑えます</span>
+              <span class="feature__desc" id="feature-dark-force-desc" data-i18n="popup_feature_dark_force_desc">明るい背景を暗くして眩しさを抑えます</span>
             </span>
           </label>
 
           <label class="feature feature--premium" data-feature="brightness-cap">
-            <input type="checkbox" class="feature__toggle" data-feature-key="brightness-cap" />
+            <input
+              type="checkbox"
+              class="feature__toggle"
+              data-feature-key="brightness-cap"
+              aria-describedby="feature-brightness-cap-desc"
+              data-i18n-attr="aria-label:popup_feature_brightness_cap"
+            />
             <span class="feature__body">
               <span class="feature__name">
                 <span data-i18n="popup_feature_brightness_cap">明るさ制限</span>
                 <span class="feature__badge" data-i18n="popup_premium_badge">Premium</span>
               </span>
-              <span class="feature__desc" data-i18n="popup_feature_brightness_cap_desc">画面全体の明るさの上限を抑えます</span>
+              <span class="feature__desc" id="feature-brightness-cap-desc" data-i18n="popup_feature_brightness_cap_desc">画面全体の明るさの上限を抑えます</span>
             </span>
           </label>
         </div>
@@ -65,15 +95,30 @@
         <h2 class="options__section-title" id="intensity-heading" data-i18n="options_section_intensity">強度</h2>
         <div class="options__intensity" role="radiogroup" aria-labelledby="intensity-heading">
           <label class="intensity">
-            <input type="radio" name="intensity" value="low" />
+            <input
+              type="radio"
+              name="intensity"
+              value="low"
+              data-i18n-attr="aria-label:options_intensity_low"
+            />
             <span data-i18n="options_intensity_low">弱</span>
           </label>
           <label class="intensity">
-            <input type="radio" name="intensity" value="medium" />
+            <input
+              type="radio"
+              name="intensity"
+              value="medium"
+              data-i18n-attr="aria-label:options_intensity_medium"
+            />
             <span data-i18n="options_intensity_medium">中</span>
           </label>
           <label class="intensity">
-            <input type="radio" name="intensity" value="high" />
+            <input
+              type="radio"
+              name="intensity"
+              value="high"
+              data-i18n-attr="aria-label:options_intensity_high"
+            />
             <span data-i18n="options_intensity_high">強</span>
           </label>
         </div>
@@ -82,12 +127,26 @@
       <section class="options__section options__section--premium" aria-labelledby="premium-heading">
         <h2 class="options__section-title" id="premium-heading" data-i18n="options_section_premium">Premium</h2>
         <div class="options__premium" id="premium-status">
-          <p class="options__premium-text" id="premium-status-text"></p>
+          <p class="options__premium-text" id="premium-status-text" role="status" aria-live="polite"></p>
           <div class="options__premium-actions">
-            <button type="button" id="trial-start-btn" class="options__btn" data-i18n="premium_trial_start" hidden>
+            <button
+              type="button"
+              id="trial-start-btn"
+              class="options__btn"
+              data-i18n="premium_trial_start"
+              data-i18n-attr="aria-label:premium_trial_start"
+              hidden
+            >
               7日間無料お試しを開始
             </button>
-            <button type="button" id="upgrade-btn" class="options__btn options__btn--primary" data-i18n="premium_upgrade_button" hidden>
+            <button
+              type="button"
+              id="upgrade-btn"
+              class="options__btn options__btn--primary"
+              data-i18n="premium_upgrade_button"
+              data-i18n-attr="aria-label:premium_upgrade_button"
+              hidden
+            >
               Premium にアップグレード ($3)
             </button>
           </div>
@@ -107,7 +166,15 @@
       </section>
 
       <footer class="options__footer">
-        <button type="button" id="reset-btn" class="options__btn" data-i18n="options_reset">初期設定に戻す</button>
+        <button
+          type="button"
+          id="reset-btn"
+          class="options__btn"
+          data-i18n="options_reset"
+          data-i18n-attr="aria-label:options_reset"
+        >
+          初期設定に戻す
+        </button>
         <span class="options__saved" id="saved-indicator" role="status" aria-live="polite" hidden data-i18n="options_saved">保存しました</span>
       </footer>
     </main>
