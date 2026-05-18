@@ -32,7 +32,6 @@ export type MessageKey =
   | "options_intensity_low"
   | "options_intensity_medium"
   | "options_intensity_high"
-  | "options_save"
   | "options_saved"
   | "options_reset"
   | "options_section_backup"

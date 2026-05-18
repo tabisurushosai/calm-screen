@@ -109,10 +109,6 @@
     "message": "High",
     "description": "Intensity: high"
   },
-  "options_save": {
-    "message": "Save",
-    "description": "Save settings button"
-  },
   "options_saved": {
     "message": "Saved",
     "description": "Save-complete message"

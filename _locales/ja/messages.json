@@ -109,10 +109,6 @@
     "message": "強",
     "description": "強度: 強"
   },
-  "options_save": {
-    "message": "保存",
-    "description": "設定保存ボタン"
-  },
   "options_saved": {
     "message": "保存しました",
     "description": "保存完了メッセージ"
