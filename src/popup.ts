@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Toolbar popup controller. Hydrates the DOM from settings,
+ * shows the trial-status banner, locks premium feature toggles when the user
+ * is not entitled, and persists changes back to `chrome.storage.local`.
+ */
+
 import { applyI18n, t } from "./i18n";
 import {
   loadSettings,
@@ -21,10 +27,12 @@ const FEATURE_KEY_MAP: Record<string, FeatureKey> = {
   "brightness-cap": "brightness_cap",
 };
 
+/** Translate a kebab-case DOM key to the canonical snake-case storage key. */
 function toFeatureKey(domKey: string): FeatureKey | null {
   return FEATURE_KEY_MAP[domKey] ?? null;
 }
 
+/** Render (or hide) the trial / unlocked / expired status banner. */
 function renderTrialBanner(status: PremiumStatus, settings: Settings): void {
   const banner = document.getElementById("trial-banner") as HTMLElement | null;
   const text = document.getElementById("trial-text");
@@ -51,10 +59,12 @@ function renderTrialBanner(status: PremiumStatus, settings: Settings): void {
   banner.hidden = true;
 }
 
+/** Visually grey out the popup when the master switch is off. */
 function applyMasterEnabledState(enabled: boolean): void {
   document.body.classList.toggle("popup--disabled", !enabled);
 }
 
+/** Disable + uncheck premium feature toggles for free users. */
 function applyPremiumLockState(
   features: NodeListOf<HTMLLabelElement>,
   premiumActive: boolean,
@@ -82,6 +92,7 @@ function applyPremiumLockState(
   });
 }
 
+/** Push the loaded settings into every relevant DOM input + banner. */
 function hydrateUi(settings: Settings): void {
   const status = getPremiumStatus(settings);
 
@@ -106,6 +117,7 @@ function hydrateUi(settings: Settings): void {
   renderTrialBanner(status, settings);
 }
 
+/** Attach change-listeners to every interactive control. */
 function wireEvents(): void {
   const master = document.getElementById("master-toggle") as HTMLInputElement | null;
   master?.addEventListener("change", () => {
@@ -136,6 +148,7 @@ function wireEvents(): void {
   });
 }
 
+/** Entrypoint: i18n, then hydrate, then wire events. */
 async function init(): Promise<void> {
   applyI18n();
   const settings = await loadSettings();

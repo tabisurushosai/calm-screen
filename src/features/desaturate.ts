@@ -1,5 +1,12 @@
+/**
+ * @fileoverview Desaturation feature. Reduces page color saturation via the
+ * CSS `saturate()` filter so vivid hues feel less stimulating. Composed into
+ * the single `<html>` filter by `compose.ts`.
+ */
+
 import type { Intensity } from "../storage";
 
+/** Tuning parameters for the desaturate CSS effect. */
 export interface DesaturateParams {
   saturate: number;
 }
@@ -12,18 +19,22 @@ const PARAMS: Record<Intensity, DesaturateParams> = {
   high: { saturate: 0.4 },
 };
 
+/** Map an intensity tier to its tuned desaturate parameters. */
 export function paramsFor(intensity: Intensity): DesaturateParams {
   return PARAMS[intensity];
 }
 
+/** Build the CSS `filter` value (used both standalone and when composed). */
 export function toFilterValue(p: DesaturateParams): string {
   return `saturate(${p.saturate})`;
 }
 
+/** Build the full CSS rule applied to `<html>`. */
 export function toCss(p: DesaturateParams): string {
   return `html{filter:${toFilterValue(p)} !important;}`;
 }
 
+/** Apply the desaturate style standalone (mirrors blue-filter's API). */
 export function apply(doc: Document, p: DesaturateParams): void {
   const css = toCss(p);
   const root = doc.documentElement;
@@ -43,6 +54,7 @@ export function apply(doc: Document, p: DesaturateParams): void {
   root.style.setProperty("filter", toFilterValue(p), "important");
 }
 
+/** Tear down both the injected `<style>` tag and the inline filter property. */
 export function remove(doc: Document): void {
   const style = doc.getElementById(STYLE_ELEMENT_ID);
   if (style && style.parentNode) {

@@ -1,5 +1,12 @@
+/**
+ * @fileoverview Animation muting. Collapses CSS animation/transition durations
+ * to near-zero and, at "high" intensity, pauses `<video autoplay>` /
+ * `<audio autoplay>` nodes (including ones added later via a `MutationObserver`).
+ */
+
 import type { Intensity } from "../storage";
 
+/** Tuning parameters for the animation-mute effect. */
 export interface AnimationMuteParams {
   duration: string;
   killAutoplay: boolean;
@@ -13,10 +20,16 @@ const PARAMS: Record<Intensity, AnimationMuteParams> = {
   high: { duration: "1ms", killAutoplay: true },
 };
 
+/** Map an intensity tier to its tuned animation-mute parameters. */
 export function paramsFor(intensity: Intensity): AnimationMuteParams {
   return PARAMS[intensity];
 }
 
+/**
+ * Build the CSS rule that clamps all animation/transition durations and
+ * disables smooth scrolling. At high intensity, also pins `will-change:auto`
+ * to discourage the browser from promoting layers for paused animations.
+ */
 export function toCss(p: AnimationMuteParams): string {
   const base =
     `*,*::before,*::after{` +
@@ -37,6 +50,7 @@ export function toCss(p: AnimationMuteParams): string {
 let observer: MutationObserver | null = null;
 const handled: WeakSet<HTMLMediaElement> = new WeakSet();
 
+/** Pause every `<video autoplay>` / `<audio autoplay>` found under `root` once. */
 function pauseAutoplayMedia(root: ParentNode): void {
   const nodes = root.querySelectorAll<HTMLMediaElement>(
     "video[autoplay],audio[autoplay]",
@@ -52,6 +66,7 @@ function pauseAutoplayMedia(root: ParentNode): void {
   }
 }
 
+/** Observe the document subtree and pause any new autoplay media nodes. */
 function startAutoplayObserver(doc: Document): void {
   if (observer) return;
   pauseAutoplayMedia(doc);
@@ -72,12 +87,17 @@ function startAutoplayObserver(doc: Document): void {
   observer.observe(target, { childList: true, subtree: true });
 }
 
+/** Disconnect the autoplay observer if one is running. */
 function stopAutoplayObserver(): void {
   if (!observer) return;
   observer.disconnect();
   observer = null;
 }
 
+/**
+ * Inject (or update) the animation-mute `<style>` tag and toggle the autoplay
+ * observer based on the requested intensity.
+ */
 export function apply(doc: Document, p: AnimationMuteParams): void {
   const css = toCss(p);
   const root = doc.documentElement;
@@ -100,6 +120,7 @@ export function apply(doc: Document, p: AnimationMuteParams): void {
   }
 }
 
+/** Remove the style tag and stop the autoplay observer. */
 export function remove(doc: Document): void {
   const style = doc.getElementById(STYLE_ELEMENT_ID);
   if (style && style.parentNode) {

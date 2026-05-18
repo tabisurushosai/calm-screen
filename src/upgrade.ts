@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Premium-upgrade flow. Builds the Stripe Checkout URL with a
+ * generated `client_reference_id` (so the webhook can identify the user
+ * later), opens it in a new tab, and exposes helpers to mark or revoke the
+ * paid-premium flag in storage.
+ */
+
 import { setPremiumUnlocked } from "./storage";
 
 export const STRIPE_CHECKOUT_URL =
@@ -5,6 +12,7 @@ export const STRIPE_CHECKOUT_URL =
 
 export const PREMIUM_PRICE_USD = 3;
 
+/** Optional inputs passed to {@link buildCheckoutUrl}. */
 export interface CheckoutUrlOptions {
   baseUrl?: string;
   clientReferenceId?: string;
@@ -14,6 +22,7 @@ export interface CheckoutUrlOptions {
 
 const ALLOWED_LOCALES: ReadonlySet<string> = new Set(["auto", "en", "ja"]);
 
+/** Loose URL sanity check (must be http/https with a non-empty host). */
 export function isValidCheckoutUrl(url: string): boolean {
   try {
     const u = new URL(url);
@@ -23,6 +32,11 @@ export function isValidCheckoutUrl(url: string): boolean {
   }
 }
 
+/**
+ * Assemble the Stripe Checkout URL, appending the supported query parameters.
+ * Throws synchronously on an invalid base URL so the bug surfaces at the
+ * call-site instead of during a tab open.
+ */
 export function buildCheckoutUrl(opts: CheckoutUrlOptions = {}): string {
   const base = opts.baseUrl ?? STRIPE_CHECKOUT_URL;
   if (!isValidCheckoutUrl(base)) {
@@ -45,6 +59,10 @@ function fallbackId(): string {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
+/**
+ * Generate a `cs_`-prefixed reference id, preferring `crypto.randomUUID` when
+ * available. The webhook joins this id back to a user's storage record.
+ */
 export function generateClientReferenceId(
   randomFn: () => string = () =>
     globalThis.crypto?.randomUUID?.() ?? fallbackId(),
@@ -52,6 +70,7 @@ export function generateClientReferenceId(
   return `cs_${randomFn()}`;
 }
 
+/** Open the Stripe Checkout page in a new tab. */
 export async function openUpgradeCheckout(
   opts: CheckoutUrlOptions = {},
 ): Promise<chrome.tabs.Tab | undefined> {
@@ -59,10 +78,12 @@ export async function openUpgradeCheckout(
   return chrome.tabs.create({ url });
 }
 
+/** Flip the paid-premium flag in storage (typically after webhook success). */
 export async function markPremiumUnlocked(): Promise<void> {
   await setPremiumUnlocked(true);
 }
 
+/** Revoke paid premium (for tests / manual rollback). */
 export async function revokePremium(): Promise<void> {
   await setPremiumUnlocked(false);
 }

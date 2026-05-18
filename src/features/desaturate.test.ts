@@ -1,3 +1,5 @@
+/** @fileoverview Unit tests for `desaturate.ts` — intensity tuning, CSS
+ *  emission, and idempotent apply/remove against a jsdom Document. */
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   STYLE_ELEMENT_ID,

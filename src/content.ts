@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Content script. Subscribes to settings changes, computes the
+ * composed CSS filter, and reconciles the DOM. Non-filter features
+ * (animation-mute and dark-force's media rules) are applied via their own
+ * modules. Reconciliation is debounced through `requestAnimationFrame` so
+ * rapid storage events coalesce into a single style write per frame.
+ */
+
 import { loadSettings, onSettingsChanged, type Settings } from "./storage";
 import { composeFilterValue } from "./features/compose";
 import * as animationMute from "./features/animation-mute";
@@ -8,6 +16,11 @@ const COMPOSED_STYLE_ID = "calm-screen-filter";
 let rafHandle: number | null = null;
 let pendingSettings: Settings | null = null;
 
+/**
+ * Inject (or remove) the single `<style id="calm-screen-filter">` tag that
+ * carries the composed filter. Also writes an inline `style="filter:..."` as
+ * a CSP fallback for sites that block `style-src 'self'`.
+ */
 function applyComposedFilter(doc: Document, value: string): void {
   const root = doc.documentElement;
   let style = doc.getElementById(COMPOSED_STYLE_ID) as HTMLStyleElement | null;
@@ -35,6 +48,7 @@ function applyComposedFilter(doc: Document, value: string): void {
   root.style.setProperty("filter", value, "important");
 }
 
+/** Toggle the animation-mute style/observer to match current settings. */
 function reconcileAnimationMute(settings: Settings): void {
   if (settings.enabled && settings.features.animation_mute) {
     animationMute.apply(document, animationMute.paramsFor(settings.intensity));
@@ -43,6 +57,7 @@ function reconcileAnimationMute(settings: Settings): void {
   }
 }
 
+/** Toggle the force-dark style tag to match current settings. */
 function reconcileDarkForce(settings: Settings): void {
   if (settings.enabled && settings.features.dark_force) {
     darkForce.apply(document, darkForce.paramsFor(settings.intensity));
@@ -51,12 +66,17 @@ function reconcileDarkForce(settings: Settings): void {
   }
 }
 
+/** Apply every active feature using the freshest settings snapshot. */
 function reconcile(settings: Settings): void {
   applyComposedFilter(document, composeFilterValue(settings));
   reconcileAnimationMute(settings);
   reconcileDarkForce(settings);
 }
 
+/**
+ * Coalesce reconciliations to one per animation frame; falls back to
+ * `setTimeout` in non-DOM environments (e.g. tests with stripped globals).
+ */
 function schedule(settings: Settings): void {
   pendingSettings = settings;
   if (rafHandle !== null) return;
@@ -75,6 +95,7 @@ function schedule(settings: Settings): void {
   }
 }
 
+/** Entrypoint: do an initial reconcile then subscribe to settings changes. */
 async function init(): Promise<void> {
   try {
     const settings = await loadSettings();

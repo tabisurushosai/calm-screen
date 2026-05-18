@@ -1,3 +1,9 @@
+/**
+ * @fileoverview MV3 service worker. Seeds `chrome.storage.local` with default
+ * settings on install/update/startup so the popup, options, and content
+ * scripts always read a fully populated record.
+ */
+
 const DEFAULT_SETTINGS = {
   enabled: true,
   features: {
@@ -19,6 +25,11 @@ const DEFAULT_SETTINGS = {
 
 type StoredSettings = typeof DEFAULT_SETTINGS;
 
+/**
+ * Seed defaults on first install or when prior storage lacks a schema version.
+ * On subsequent updates, fill in any keys missing from the persisted record
+ * without overwriting existing user choices.
+ */
 async function initializeStorage(reason: chrome.runtime.OnInstalledReason): Promise<void> {
   const current = (await chrome.storage.local.get(null)) as Partial<StoredSettings>;
 

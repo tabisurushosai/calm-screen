@@ -1,5 +1,13 @@
+/**
+ * @fileoverview Force-dark feature. Inverts the page (`invert(1)
+ * hue-rotate(180deg)`) and selectively un-inverts `<img>`, `<video>`, etc. so
+ * photos render in their natural colors. Higher intensities also un-invert
+ * inline `background-image` styles.
+ */
+
 import type { Intensity } from "../storage";
 
+/** Tuning parameters for the force-dark effect. */
 export interface DarkForceParams {
   invert: boolean;
   reverseMedia: boolean;
@@ -16,14 +24,24 @@ const PARAMS: Record<Intensity, DarkForceParams> = {
   high: { invert: true, reverseMedia: true, reverseBgImage: true },
 };
 
+/** Map an intensity tier to its tuned force-dark parameters. */
 export function paramsFor(intensity: Intensity): DarkForceParams {
   return PARAMS[intensity];
 }
 
+/**
+ * Filter portion that contributes to the composed `<html>` filter — empty
+ * string when no inversion is desired so `compose.ts` can drop it cleanly.
+ */
 export function toFilterValue(p: DarkForceParams): string {
   return p.invert ? INVERT_FILTER : "";
 }
 
+/**
+ * Standalone CSS rule — sets `color-scheme:dark` and (when enabled) the media
+ * un-invert rule. The `<html>`-level inversion is supplied separately via the
+ * composed filter to avoid duplicating it.
+ */
 export function toCss(p: DarkForceParams): string {
   let css = `html{color-scheme:dark !important;}`;
   if (p.reverseMedia) {
@@ -43,6 +61,7 @@ export function toCss(p: DarkForceParams): string {
   return css;
 }
 
+/** Inject or update the force-dark `<style>` tag. */
 export function apply(doc: Document, p: DarkForceParams): void {
   const css = toCss(p);
   const root = doc.documentElement;
@@ -59,6 +78,7 @@ export function apply(doc: Document, p: DarkForceParams): void {
   }
 }
 
+/** Remove the force-dark style tag. */
 export function remove(doc: Document): void {
   const style = doc.getElementById(STYLE_ELEMENT_ID);
   if (style && style.parentNode) {

@@ -1,3 +1,5 @@
+/** @fileoverview Unit tests for `dark-force.ts` — invert filter selection,
+ *  media un-inversion selectors per intensity, and CSS emission. */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   INVERT_FILTER,

@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Typed wrapper around `chrome.storage.local`. Owns the canonical
+ * settings shape (`Settings`), defaults, premium-feature registry, and the
+ * subscribe helper used by the content script to react to setting changes.
+ */
+
+/** Identifier for each user-visible visual-comfort feature. */
 export type FeatureKey =
   | "blue_filter"
   | "desaturate"
@@ -5,8 +12,10 @@ export type FeatureKey =
   | "dark_force"
   | "brightness_cap";
 
+/** Strength level applied uniformly across active features. */
 export type Intensity = "low" | "medium" | "high";
 
+/** Persistent settings shape stored under `chrome.storage.local`. */
 export interface Settings {
   enabled: boolean;
   features: Record<FeatureKey, boolean>;
@@ -63,6 +72,11 @@ function coerceFeatures(raw: unknown): Record<FeatureKey, boolean> {
   return out;
 }
 
+/**
+ * Read the persisted settings, coercing each field to its expected type and
+ * substituting `DEFAULTS` for any missing/corrupted value. Always returns a
+ * fully populated `Settings` object so callers do not need to null-check.
+ */
 export async function loadSettings(): Promise<Settings> {
   const raw = (await chrome.storage.local.get([
     "enabled",
@@ -86,14 +100,20 @@ export async function loadSettings(): Promise<Settings> {
   };
 }
 
+/** Merge a partial settings patch into storage; no validation is performed. */
 export async function saveSettings(patch: Partial<Settings>): Promise<void> {
   await chrome.storage.local.set(patch);
 }
 
+/** Toggle the master on/off switch shown in the popup. */
 export async function setMasterEnabled(enabled: boolean): Promise<void> {
   await chrome.storage.local.set({ enabled });
 }
 
+/**
+ * Persist a single feature toggle while preserving the other feature flags.
+ * Internally re-coerces the current map so a corrupted record self-heals.
+ */
 export async function setFeature(key: FeatureKey, value: boolean): Promise<void> {
   const current = (await chrome.storage.local.get("features")) as {
     features?: Record<FeatureKey, boolean>;
@@ -102,18 +122,26 @@ export async function setFeature(key: FeatureKey, value: boolean): Promise<void>
   await chrome.storage.local.set({ features: next });
 }
 
+/** Persist the global intensity level. */
 export async function setIntensity(intensity: Intensity): Promise<void> {
   await chrome.storage.local.set({ intensity });
 }
 
+/** Stamp `now` as the trial start, kicking off the 7-day premium trial. */
 export async function startTrial(now: number = Date.now()): Promise<void> {
   await chrome.storage.local.set({ trial_start_ts: now });
 }
 
+/** Flip the paid-premium flag (called after Stripe webhook confirmation). */
 export async function setPremiumUnlocked(unlocked: boolean): Promise<void> {
   await chrome.storage.local.set({ premium_unlocked: unlocked });
 }
 
+/**
+ * Reset `enabled`, `features`, and `intensity` back to defaults. Premium and
+ * trial state are intentionally preserved so a "reset" cannot grant a second
+ * trial period.
+ */
 export async function resetToDefaults(): Promise<void> {
   await chrome.storage.local.set({
     enabled: DEFAULTS.enabled,
@@ -122,6 +150,10 @@ export async function resetToDefaults(): Promise<void> {
   });
 }
 
+/**
+ * Days left in the trial, rounded up. Returns `0` once the window has lapsed
+ * or when no trial has been started.
+ */
 export function trialDaysRemaining(
   trialStartTs: number | null,
   now: number = Date.now(),
@@ -132,6 +164,10 @@ export function trialDaysRemaining(
   return Math.max(0, remaining);
 }
 
+/**
+ * `true` when the user has either paid for premium or is still inside the
+ * trial window. The richer status object lives in `premium.ts`.
+ */
 export function isPremiumActive(
   settings: Pick<Settings, "premium_unlocked" | "trial_start_ts">,
   now: number = Date.now(),
@@ -140,11 +176,19 @@ export function isPremiumActive(
   return trialDaysRemaining(settings.trial_start_ts, now) > 0;
 }
 
+/** Callback invoked with the freshly loaded settings plus raw change deltas. */
 export type SettingsChangeHandler = (
   next: Settings,
   changes: { [K in keyof Settings]?: { oldValue?: Settings[K]; newValue?: Settings[K] } },
 ) => void;
 
+/**
+ * Subscribe to `chrome.storage.local` changes for any tracked settings key.
+ * Reloads and re-validates the full `Settings` object before invoking
+ * `handler`, so subscribers never see partial state.
+ *
+ * @returns An unsubscribe function that removes the underlying listener.
+ */
 export function onSettingsChanged(handler: SettingsChangeHandler): () => void {
   const listener = (
     changes: { [key: string]: chrome.storage.StorageChange },

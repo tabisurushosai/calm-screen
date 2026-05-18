@@ -1,3 +1,5 @@
+/** @fileoverview Unit tests for `compose.ts` — verifies feature ordering,
+ *  master-switch handling, and premium-gating in the composed filter value. */
 import { describe, it, expect } from "vitest";
 import { composeFilterValue } from "./compose";
 import * as blueFilter from "./blue-filter";

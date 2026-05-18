@@ -1,3 +1,5 @@
+/** @fileoverview Unit tests for `premium.ts` — tier inference, trial-window
+ *  math, and feature-gating helpers across paid/trial/free/expired states. */
 import { describe, it, expect } from "vitest";
 import {
   TRIAL_DURATION_MS,

@@ -1,3 +1,5 @@
+/** @fileoverview Unit tests for `animation-mute.ts` — CSS rule emission,
+ *  autoplay observer lifecycle, and dynamic node handling under jsdom. */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   STYLE_ELEMENT_ID,

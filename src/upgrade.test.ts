@@ -1,3 +1,5 @@
+/** @fileoverview Unit tests for `upgrade.ts` — checkout URL builder,
+ *  client-reference-id generation, and premium flag persistence helpers. */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   PREMIUM_PRICE_USD,

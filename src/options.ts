@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Options page controller. Hydrates feature toggles + intensity
+ * radios, manages premium UI (start trial / upgrade / unlocked), and persists
+ * each change immediately with a brief "saved" flash.
+ */
+
 import { applyI18n, t } from "./i18n";
 import {
   loadSettings,
@@ -26,10 +32,12 @@ const FEATURE_KEY_MAP: Record<string, FeatureKey> = {
   "brightness-cap": "brightness_cap",
 };
 
+/** Translate a kebab-case DOM key to the canonical snake-case storage key. */
 function toFeatureKey(domKey: string): FeatureKey | null {
   return FEATURE_KEY_MAP[domKey] ?? null;
 }
 
+/** Disable + uncheck premium feature toggles when premium is inactive. */
 function applyPremiumLockState(premiumActive: boolean): void {
   document
     .querySelectorAll<HTMLLabelElement>(".feature")
@@ -56,6 +64,7 @@ function applyPremiumLockState(premiumActive: boolean): void {
     });
 }
 
+/** Render the premium status text and toggle trial/upgrade buttons. */
 function renderPremiumSection(status: PremiumStatus, settings: Settings): void {
   const text = document.getElementById("premium-status-text");
   const trialBtn = document.getElementById(
@@ -92,6 +101,7 @@ function renderPremiumSection(status: PremiumStatus, settings: Settings): void {
   upgradeBtn.hidden = false;
 }
 
+/** Push the loaded settings into every input + the premium section. */
 function hydrateUi(settings: Settings): void {
   const status = getPremiumStatus(settings);
 
@@ -117,6 +127,7 @@ function hydrateUi(settings: Settings): void {
   renderPremiumSection(status, settings);
 }
 
+/** Briefly show the "saved" indicator (1.5s) after a setting persists. */
 function flashSaved(): void {
   const indicator = document.getElementById("saved-indicator") as HTMLElement | null;
   if (!indicator) return;
@@ -126,6 +137,7 @@ function flashSaved(): void {
   }, 1500);
 }
 
+/** Attach change-listeners to every interactive control. */
 function wireEvents(): void {
   document
     .querySelectorAll<HTMLInputElement>(".feature__toggle")
@@ -180,6 +192,7 @@ function wireEvents(): void {
   });
 }
 
+/** Entrypoint: i18n, then hydrate, then wire events. */
 async function init(): Promise<void> {
   applyI18n();
   const settings = await loadSettings();

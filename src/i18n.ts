@@ -1,3 +1,10 @@
+/**
+ * @fileoverview chrome.i18n thin wrapper. Provides typed message keys and a
+ * DOM-walker that applies translations to elements marked with `data-i18n`
+ * (textContent) and `data-i18n-attr` (attribute values).
+ */
+
+/** Union of every message key declared in `_locales/<lang>/messages.json`. */
 export type MessageKey =
   | "appName"
   | "appDesc"
@@ -36,11 +43,27 @@ export type MessageKey =
   | "premium_trial_expired"
   | "premium_feature_locked";
 
+/**
+ * Look up a localized message by key, falling back to the key itself when no
+ * translation is registered (useful during development to surface missing
+ * entries instead of rendering blank text).
+ *
+ * @param key Message key declared in `_locales/<lang>/messages.json`.
+ * @param substitutions Positional values for `$1`, `$2`, ... placeholders.
+ * @returns The localized string, or `key` when no entry exists.
+ */
 export function t(key: MessageKey, substitutions?: string | string[]): string {
   const message = chrome.i18n.getMessage(key, substitutions);
   return message || key;
 }
 
+/**
+ * Translate every element under `root` that has a `data-i18n` (textContent) or
+ * `data-i18n-attr="attr:key,attr2:key2"` (attribute) marker. Also sets the
+ * root `<html lang>` attribute from `chrome.i18n.getUILanguage()` when unset.
+ *
+ * @param root Subtree to scan. Defaults to the whole document.
+ */
 export function applyI18n(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>("[data-i18n]").forEach((el) => {
     const key = el.dataset.i18n as MessageKey | undefined;

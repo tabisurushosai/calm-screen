@@ -1,5 +1,12 @@
+/**
+ * @fileoverview Brightness-cap feature (premium). Dims the entire page via the
+ * CSS `brightness()` filter. Premium-gated by `PREMIUM_FEATURES` in
+ * `storage.ts`; gating itself is enforced in `premium.ts` / `compose.ts`.
+ */
+
 import type { Intensity } from "../storage";
 
+/** Tuning parameters for the brightness-cap effect. */
 export interface BrightnessCapParams {
   brightness: number;
 }
@@ -12,18 +19,22 @@ const PARAMS: Record<Intensity, BrightnessCapParams> = {
   high: { brightness: 0.6 },
 };
 
+/** Map an intensity tier to its tuned brightness-cap parameters. */
 export function paramsFor(intensity: Intensity): BrightnessCapParams {
   return PARAMS[intensity];
 }
 
+/** Build the CSS `filter` value used both standalone and when composed. */
 export function toFilterValue(p: BrightnessCapParams): string {
   return `brightness(${p.brightness})`;
 }
 
+/** Build the full CSS rule applied to `<html>`. */
 export function toCss(p: BrightnessCapParams): string {
   return `html{filter:${toFilterValue(p)} !important;}`;
 }
 
+/** Apply the brightness-cap style standalone (mirrors blue-filter's API). */
 export function apply(doc: Document, p: BrightnessCapParams): void {
   const css = toCss(p);
   const root = doc.documentElement;
@@ -43,6 +54,7 @@ export function apply(doc: Document, p: BrightnessCapParams): void {
   root.style.setProperty("filter", toFilterValue(p), "important");
 }
 
+/** Tear down both the injected `<style>` tag and the inline filter property. */
 export function remove(doc: Document): void {
   const style = doc.getElementById(STYLE_ELEMENT_ID);
   if (style && style.parentNode) {
