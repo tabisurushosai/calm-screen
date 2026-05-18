@@ -168,6 +168,22 @@
   font-weight: 500;
 }
 
+.options__backup-status {
+  font-size: 13px;
+  color: var(--accent);
+  min-height: 1.2em;
+}
+
+.options__backup-status--error {
+  color: #c0392b;
+}
+
+@media (prefers-color-scheme: dark) {
+  .options__backup-status--error {
+    color: #ff7a6c;
+  }
+}
+
 @media (prefers-contrast: more) {
   .options__section,
   .intensity,

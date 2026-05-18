@@ -153,6 +153,43 @@
         </div>
       </section>
 
+      <section class="options__section" aria-labelledby="backup-heading">
+        <h2 class="options__section-title" id="backup-heading" data-i18n="options_section_backup">バックアップ</h2>
+        <p class="options__premium-text" data-i18n="options_backup_desc">設定を JSON ファイルに書き出し、別の端末で読み込めます (Premium 情報は含まれません)</p>
+        <div class="options__premium-actions">
+          <button
+            type="button"
+            id="export-btn"
+            class="options__btn"
+            data-i18n="options_export"
+            data-i18n-attr="aria-label:options_export"
+          >
+            設定を書き出す
+          </button>
+          <button
+            type="button"
+            id="import-btn"
+            class="options__btn"
+            data-i18n="options_import"
+            data-i18n-attr="aria-label:options_import"
+          >
+            設定を読み込む
+          </button>
+          <input
+            type="file"
+            id="import-file"
+            accept="application/json,.json"
+            hidden
+          />
+        </div>
+        <span
+          class="options__backup-status"
+          id="backup-status"
+          role="status"
+          aria-live="polite"
+        ></span>
+      </section>
+
       <section class="options__section" aria-labelledby="about-heading">
         <h2 class="options__section-title" id="about-heading" data-i18n="options_section_about">このアプリについて</h2>
         <ul class="options__links">

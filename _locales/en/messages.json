@@ -121,6 +121,38 @@
     "message": "Reset to defaults",
     "description": "Reset button"
   },
+  "options_section_backup": {
+    "message": "Backup",
+    "description": "Heading for the backup section"
+  },
+  "options_backup_desc": {
+    "message": "Export your settings to a JSON file and import them on another device (Premium status is not included)",
+    "description": "Description for the backup feature"
+  },
+  "options_export": {
+    "message": "Export settings",
+    "description": "Settings export button"
+  },
+  "options_import": {
+    "message": "Import settings",
+    "description": "Settings import button"
+  },
+  "options_export_done": {
+    "message": "Settings exported",
+    "description": "Export-success message"
+  },
+  "options_export_failed": {
+    "message": "Export failed",
+    "description": "Export-failed message"
+  },
+  "options_import_done": {
+    "message": "Settings imported",
+    "description": "Import-success message"
+  },
+  "options_import_failed": {
+    "message": "Could not read the file. Please make sure it is a valid export file.",
+    "description": "Import-failed alert"
+  },
   "options_privacy_link": {
     "message": "Privacy Policy",
     "description": "Link to the privacy policy"

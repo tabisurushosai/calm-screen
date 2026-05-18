@@ -8,6 +8,7 @@ import { applyI18n, t } from "./i18n";
 import {
   loadSettings,
   resetToDefaults,
+  saveSettings,
   setFeature,
   setIntensity,
   type FeatureKey,
@@ -23,6 +24,11 @@ import {
   type PremiumStatus,
 } from "./premium";
 import { openUpgradeCheckout } from "./upgrade";
+import {
+  exportFilename,
+  parseSettingsImport,
+  serializeSettings,
+} from "./settings-io";
 
 const FEATURE_KEY_MAP: Record<string, FeatureKey> = {
   "blue-filter": "blue_filter",
@@ -221,6 +227,79 @@ function wireEvents(): void {
     openUpgradeCheckout({ locale: chrome.i18n.getUILanguage().startsWith("ja") ? "ja" : "en" }).catch(
       (err) => console.error("[calm-screen] openUpgradeCheckout failed", err),
     );
+  });
+
+  const backupStatus = document.getElementById(
+    "backup-status",
+  ) as HTMLElement | null;
+
+  const setBackupStatus = (msg: string, isError = false): void => {
+    if (!backupStatus) return;
+    backupStatus.textContent = msg;
+    backupStatus.classList.toggle("options__backup-status--error", isError);
+    if (!msg) return;
+    window.setTimeout(() => {
+      if (backupStatus.textContent === msg) {
+        backupStatus.textContent = "";
+        backupStatus.classList.remove("options__backup-status--error");
+      }
+    }, 4000);
+  };
+
+  const exportBtn = document.getElementById(
+    "export-btn",
+  ) as HTMLButtonElement | null;
+  exportBtn?.addEventListener("click", async () => {
+    try {
+      const settings = await loadSettings();
+      const payload = serializeSettings(settings);
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = exportFilename();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setBackupStatus(t("options_export_done"));
+    } catch (err) {
+      console.error("[calm-screen] export failed", err);
+      setBackupStatus(t("options_export_failed"), true);
+    }
+  });
+
+  const importBtn = document.getElementById(
+    "import-btn",
+  ) as HTMLButtonElement | null;
+  const importFile = document.getElementById(
+    "import-file",
+  ) as HTMLInputElement | null;
+  importBtn?.addEventListener("click", () => {
+    importFile?.click();
+  });
+  importFile?.addEventListener("change", async () => {
+    const file = importFile.files?.[0];
+    importFile.value = "";
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = parseSettingsImport(text);
+      if (!parsed) {
+        setBackupStatus(t("options_import_failed"), true);
+        return;
+      }
+      await saveSettings(parsed);
+      const settings = await loadSettings();
+      hydrateUi(settings);
+      setBackupStatus(t("options_import_done"));
+      flashSaved();
+    } catch (err) {
+      console.error("[calm-screen] import failed", err);
+      setBackupStatus(t("options_import_failed"), true);
+    }
   });
 }
 

@@ -121,6 +121,38 @@
     "message": "初期設定に戻す",
     "description": "リセットボタン"
   },
+  "options_section_backup": {
+    "message": "バックアップ",
+    "description": "バックアップセクションの見出し"
+  },
+  "options_backup_desc": {
+    "message": "設定を JSON ファイルに書き出し、別の端末で読み込めます (Premium 情報は含まれません)",
+    "description": "バックアップ機能の説明"
+  },
+  "options_export": {
+    "message": "設定を書き出す",
+    "description": "設定のエクスポートボタン"
+  },
+  "options_import": {
+    "message": "設定を読み込む",
+    "description": "設定のインポートボタン"
+  },
+  "options_export_done": {
+    "message": "設定を書き出しました",
+    "description": "エクスポート成功メッセージ"
+  },
+  "options_export_failed": {
+    "message": "書き出しに失敗しました",
+    "description": "エクスポート失敗メッセージ"
+  },
+  "options_import_done": {
+    "message": "設定を読み込みました",
+    "description": "インポート成功メッセージ"
+  },
+  "options_import_failed": {
+    "message": "ファイルを読み込めませんでした。正しい書き出しファイルか確認してください。",
+    "description": "インポート失敗時の警告"
+  },
   "options_privacy_link": {
     "message": "プライバシーポリシー",
     "description": "プライバシーポリシーへのリンク"
