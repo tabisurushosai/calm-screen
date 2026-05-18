@@ -167,3 +167,30 @@
   color: var(--accent);
   font-weight: 500;
 }
+
+@media (prefers-contrast: more) {
+  .options__section,
+  .intensity,
+  .options__btn {
+    border-width: 2px;
+  }
+
+  .options__btn:focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+
+  .options__section-title,
+  .options__premium-text {
+    color: var(--fg);
+  }
+
+  .options__links a {
+    text-decoration: underline;
+  }
+
+  .intensity:has(input:checked) {
+    background: var(--accent);
+    color: var(--accent-fg);
+  }
+}
