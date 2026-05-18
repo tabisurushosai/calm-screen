@@ -137,6 +137,36 @@ function flashSaved(): void {
   }, 1500);
 }
 
+/**
+ * Add Enter-key toggle support to a checkbox. Native checkboxes only respond
+ * to Space; users coming from button-like controls (or screen-reader users
+ * accustomed to Enter) expect Enter to work too.
+ */
+function enableEnterToggle(input: HTMLInputElement): void {
+  input.addEventListener("keydown", (ev) => {
+    if (ev.key !== "Enter") return;
+    if (input.disabled) return;
+    ev.preventDefault();
+    input.checked = !input.checked;
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+}
+
+/**
+ * Add Enter-key selection support to a radio. Native radios respond to arrow
+ * keys; adding Enter matches user expectations for "confirm this choice".
+ */
+function enableEnterSelect(input: HTMLInputElement): void {
+  input.addEventListener("keydown", (ev) => {
+    if (ev.key !== "Enter") return;
+    if (input.disabled) return;
+    if (input.checked) return;
+    ev.preventDefault();
+    input.checked = true;
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+}
+
 /** Attach change-listeners to every interactive control. */
 function wireEvents(): void {
   document
@@ -150,6 +180,7 @@ function wireEvents(): void {
         await setFeature(key, input.checked);
         flashSaved();
       });
+      enableEnterToggle(input);
     });
 
   document
@@ -160,6 +191,7 @@ function wireEvents(): void {
         await setIntensity(input.value as Intensity);
         flashSaved();
       });
+      enableEnterSelect(input);
     });
 
   const resetBtn = document.getElementById(

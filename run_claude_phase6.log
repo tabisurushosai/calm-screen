@@ -7,3 +7,5 @@ T102 完了。`src/**/*.ts` 全 19 ファイル (本体 11 + テスト 8) に fi
 - 検証: `npm run lint` (tsc --noEmit) clean、`npm test` 156/156 passing
 - TODO_PHASE6.md の T102 を `[x]` に更新、commit + push 済 (`d09486a`)
 [12:52:17] [calm-screen phase6 L3] 残13
+T103 完了。popup/options 両ページの全 input (checkbox/radio) と button に `data-i18n-attr` 経由で `aria-label` を付与、各 feature checkbox に `aria-describedby="feature-<name>-desc"` を追加 (`.feature__desc` に対応 id 付与) して accessible name と description を分離、trial-banner と premium-status-text に `role="status"` + `aria-live="polite"` を追加。lint 通過、156/156 テスト合格、push 済。
+[12:55:55] [calm-screen phase6 L4] 残12

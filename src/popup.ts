@@ -117,16 +117,34 @@ function hydrateUi(settings: Settings): void {
   renderTrialBanner(status, settings);
 }
 
+/**
+ * Add Enter-key toggle support to a checkbox. Native checkboxes only respond
+ * to Space; users coming from button-like controls (or screen-reader users
+ * accustomed to Enter) expect Enter to work too.
+ */
+function enableEnterToggle(input: HTMLInputElement): void {
+  input.addEventListener("keydown", (ev) => {
+    if (ev.key !== "Enter") return;
+    if (input.disabled) return;
+    ev.preventDefault();
+    input.checked = !input.checked;
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+}
+
 /** Attach change-listeners to every interactive control. */
 function wireEvents(): void {
   const master = document.getElementById("master-toggle") as HTMLInputElement | null;
-  master?.addEventListener("change", () => {
-    const enabled = master.checked;
-    applyMasterEnabledState(enabled);
-    setMasterEnabled(enabled).catch((err) => {
-      console.error("[calm-screen] failed to persist enabled", err);
+  if (master) {
+    master.addEventListener("change", () => {
+      const enabled = master.checked;
+      applyMasterEnabledState(enabled);
+      setMasterEnabled(enabled).catch((err) => {
+        console.error("[calm-screen] failed to persist enabled", err);
+      });
     });
-  });
+    enableEnterToggle(master);
+  }
 
   document.querySelectorAll<HTMLInputElement>(".feature__toggle").forEach((input) => {
     input.addEventListener("change", async () => {
@@ -136,6 +154,7 @@ function wireEvents(): void {
       if (!key) return;
       await setFeature(key, input.checked);
     });
+    enableEnterToggle(input);
   });
 
   const openOptions = document.getElementById("open-options");
@@ -144,6 +163,13 @@ function wireEvents(): void {
       chrome.runtime.openOptionsPage();
     } else {
       window.open(chrome.runtime.getURL("options.html"));
+    }
+  });
+
+  // Escape closes the popup, matching common toolbar-popup UX.
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape") {
+      window.close();
     }
   });
 }
