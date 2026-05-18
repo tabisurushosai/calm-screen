@@ -245,6 +245,16 @@ export function onSettingsChanged(handler: SettingsChangeHandler): () => void {
       });
   };
 
-  chrome.storage.onChanged.addListener(listener);
-  return () => chrome.storage.onChanged.removeListener(listener);
+  try {
+    chrome.storage.onChanged.addListener(listener);
+  } catch (err) {
+    console.error("[calm-screen] chrome.storage.onChanged.addListener failed", err);
+  }
+  return () => {
+    try {
+      chrome.storage.onChanged.removeListener(listener);
+    } catch (err) {
+      console.error("[calm-screen] chrome.storage.onChanged.removeListener failed", err);
+    }
+  };
 }
