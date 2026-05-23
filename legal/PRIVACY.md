@@ -1,6 +1,6 @@
 # プライバシーポリシー / Privacy Policy
 
-最終更新日 / Last updated: 2026-05-17
+最終更新日 / Last updated: 2026-05-23
 
 ---
 
@@ -8,7 +8,7 @@
 
 ### 1. 基本方針
 「やさしい画面 (calm-screen)」(以下、本拡張機能) は、利用者のプライバシーを最大限に尊重します。
-本拡張機能は、個人を識別できる情報を一切収集せず、外部サーバーへも送信しません。
+本拡張機能は、通常動作時に個人を識別できる情報を一切収集せず、閲覧データや設定を外部サーバーへ送信しません。
 
 ### 2. 収集しない情報
 本拡張機能は以下の情報を収集しません。
@@ -50,7 +50,7 @@ Stripe のプライバシーポリシーは https://stripe.com/privacy をご確
 
 ### 1. Basic Policy
 "calm-screen" (the "Extension") respects user privacy to the fullest extent.
-The Extension does not collect any personally identifiable information, nor does it transmit any data to external servers.
+During normal operation, the Extension does not collect personally identifiable information and does not transmit browsing data or settings to external servers.
 
 ### 2. Information Not Collected
 The Extension does not collect the following:
